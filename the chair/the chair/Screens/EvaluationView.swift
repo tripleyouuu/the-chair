@@ -11,20 +11,22 @@ import SwiftUI
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
 
-    private let initialIndex: Int
+    @Environment(\.dismiss) private var dismiss
+
     @State private var currentIndex: Int
-
-    init(clothesStore: ClothesStore, initialIndex: Int? = nil) {
-        self.clothesStore = clothesStore
-
-        let startingIndex = initialIndex ?? max(clothesStore.clothes.count - 1, 0)
-
-        self.initialIndex = startingIndex
-        _currentIndex = State(initialValue: startingIndex)
-    }
     @State private var hoursWorn = 8.0
     @State private var environmentIndex = 2
     @State private var activityIndex = 2
+
+    init(
+        clothesStore: ClothesStore,
+        initialIndex: Int? = nil
+    ) {
+        self.clothesStore = clothesStore
+
+        let startingIndex = initialIndex ?? max(clothesStore.clothes.count - 1, 0)
+        _currentIndex = State(initialValue: startingIndex)
+    }
 
     private let environments: [EnvironmentLevel] = [
         .cold,
@@ -101,11 +103,21 @@ struct EvaluationView: View {
         }
         .navigationTitle("Evaluate")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                }
+            }
+            // a custom back button was needed to make the go-straight-home logic work
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
                     PileListView(
-                        clothesStore: clothesStore
+                        clothesStore: clothesStore,
+                        currentIndex: $currentIndex
                     )
                 } label: {
                     Image(systemName: "list.dash")
@@ -118,13 +130,9 @@ struct EvaluationView: View {
         ScrollView {
             VStack(spacing: 24) {
                 garmentPreview(for: item)
-
                 durationSection
-
                 environmentSection
-
                 activitySection
-
                 verdictSection
             }
             .padding(.horizontal, 24)
@@ -163,7 +171,6 @@ struct EvaluationView: View {
                         Image(systemName: "minus")
                     }
 
-
                     TextField(
                         "",
                         value: $hoursWorn,
@@ -172,7 +179,6 @@ struct EvaluationView: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .frame(width: 60)
-
 
                     Button {
                         hoursWorn += 1
@@ -184,7 +190,7 @@ struct EvaluationView: View {
                 Text("     hours") // lmao
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
+
                 Spacer()
             }
         }
@@ -198,7 +204,7 @@ struct EvaluationView: View {
 
                 Text(environmentName)
                     .foregroundStyle(.secondary)
-                
+
                 Button {
                 } label: {
                     Image(systemName: "questionmark")
@@ -237,7 +243,7 @@ struct EvaluationView: View {
 
                 Text(activityName)
                     .foregroundStyle(.secondary)
-                
+
                 Button {
                 } label: {
                     Image(systemName: "questionmark")
@@ -349,5 +355,7 @@ struct EvaluationView: View {
     let store = ClothesStore()
     store.seedMockData()
 
-    return EvaluationView(clothesStore: store)
+    return NavigationStack {
+        EvaluationView(clothesStore: store)
+    }
 }

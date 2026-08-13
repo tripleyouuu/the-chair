@@ -2,36 +2,61 @@ import SwiftUI
 
 struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
+    @Binding var currentIndex: Int
+
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        List {
-            ForEach(Array(clothesStore.clothes.enumerated()), id: \.element.id) { index, item in
-                NavigationLink {
-                    EvaluationView(
-                        clothesStore: clothesStore,
-                        initialIndex: index
-                    )
-                } label: {
-                    HStack(spacing: 16) {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.gray.opacity(0.1))
-                            .frame(width: 56, height: 56)
-                            .overlay {
-                                Image(systemName: "tshirt")
-                                    .font(.title2)
-                                    .foregroundStyle(.secondary)
-                            }
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(
+                    Array(clothesStore.clothes.enumerated().reversed()),
+                    id: \.element.id
+                ) { index, item in
+                    Button {
+                        currentIndex = index //picking an item from the list just goes to the og evalview instead of creating one for the chosen item and then returning
+                        dismiss() //tells the listview to fuck itself instead of lodging in the navigation flow
+                    } label: {
+                        HStack {
+                            Image(systemName: "tshirt")
+                                .font(.title2)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 56, height: 56)
+                                .background(.gray.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                        Text(item.nickname ?? "Nickname")
-                            .font(.body)
+                            Text(item.nickname ?? "Nickname")
+                                .foregroundStyle(.primary)
 
-                        Spacer()
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(.background)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
-                    .padding(.vertical, 8)
+                    .buttonStyle(.plain)
                 }
             }
+            .padding()
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("Pile")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    let store = ClothesStore()
+    store.seedMockData()
+
+    return NavigationStack {
+        PileListView(
+            clothesStore: store,
+            currentIndex: .constant(store.clothes.count - 1)
+        )
     }
 }

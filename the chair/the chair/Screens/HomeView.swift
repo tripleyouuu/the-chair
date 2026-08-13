@@ -1,5 +1,5 @@
 //
-//  EvaluationView.swift
+//  HomeView.swift
 //
 //
 //  Created by Vitha Watson on 13/08/26.
@@ -18,17 +18,17 @@ struct HomeView: View {
                 Text("Clothes saved from over-washing: 67") // hehe kill me
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
+
                 Spacer()
 
                 Image(systemName: "chair")
                     .font(.system(size: 240))
                     .foregroundStyle(.secondary)
                     .frame(maxHeight: 280)
-                
+
                 Spacer()
 
-                VStack(spacing: 16){
+                VStack(spacing: 16) {
                     NavigationLink {
                         EvaluationView(clothesStore: clothesStore)
                     } label: {
@@ -39,7 +39,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .padding(.horizontal, 24)
-                    
+
                     Text("The Chair isn't the problem, it's the solution!")
                         .font(.caption)
                         .foregroundStyle(.secondary)
