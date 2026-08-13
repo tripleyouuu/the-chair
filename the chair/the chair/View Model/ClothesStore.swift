@@ -21,7 +21,7 @@ final class ClothesStore: ObservableObject {
         }
     }
 
-    private func seedMockData() {
+    func seedMockData() {
         clothes = [
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .cottonLinen, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
             ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .pile),
