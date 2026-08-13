@@ -12,7 +12,8 @@ struct ClothingItem: Identifiable, Codable {
     var nickname: String?
     var clothingMaterial: ClothingMaterial
     var clothingColor: ClothingColor
-    var clothingCategory: ClothingCategory
+    var silhouette: ClothingSilhouette
+    var location: ClothingLocation
     var wearSessions: [WearSession]
 
     init(
@@ -20,20 +21,27 @@ struct ClothingItem: Identifiable, Codable {
         nickname: String? = nil,
         clothingMaterial: ClothingMaterial,
         clothingColor: ClothingColor,
-        clothingCategory: ClothingCategory,
+        silhouette: ClothingSilhouette,
+        location: ClothingLocation = .pile,
         wearSessions: [WearSession] = []
     ) {
         self.id = id
         self.nickname = nickname
         self.clothingMaterial = clothingMaterial
         self.clothingColor = clothingColor
-        self.clothingCategory = clothingCategory
+        self.silhouette = silhouette
+        self.location = location
         self.wearSessions = wearSessions
     }
 
-    // Lookup key for design's silhouette set assets, this is just the name they'll match.
+    // A silhouette only belongs to one category
+    var clothingCategory: ClothingCategory {
+        silhouette.category
+    }
+
+    // Lookup key for design's silhouette assets, this is the name they'll match.
     var silhouetteAssetName: String {
-        let name = String(describing: clothingCategory)
+        let name = String(describing: silhouette)
         return "silhouette" + name.prefix(1).uppercased() + name.dropFirst()
     }
 
@@ -52,5 +60,10 @@ struct ClothingItem: Identifiable, Codable {
     var needsWash: Bool {
         guard !wearSessions.isEmpty else { return false }
         return wearabilityRemaining <= 0
+    }
+
+    // Wash the instant it's worn (dry-fit, silk, white-on-non-denim/wool) 
+    var isUrgentWash: Bool {
+        needsWash && totalWearability == 0
     }
 }
