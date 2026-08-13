@@ -10,8 +10,8 @@ import Foundation
 enum ClothingMaterial: String, CaseIterable, Codable, Identifiable {
     case dryFit = "Dry-Fit"
     case silk = "Silk"
-    case cottonLinen = "Cotton/Linen"
-    case nylonPolyester = "Nylon/Polyester"
+    case natural = "Natural"
+    case synthetic = "Synthetic"
     case denim = "Denim"
     case wool = "Wool"
 
@@ -20,8 +20,8 @@ enum ClothingMaterial: String, CaseIterable, Codable, Identifiable {
     var baseHours: Double {
         switch self {
         case .dryFit, .silk: return 0
-        case .cottonLinen: return 16
-        case .nylonPolyester: return 12
+        case .natural: return 16
+        case .synthetic: return 12
         case .denim: return 48
         case .wool: return 56
         }
