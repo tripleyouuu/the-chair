@@ -1,6 +1,6 @@
 //
 //  EvaluationView.swift
-//  
+//
 //
 //  Created by Vitha Watson on 12/08/26.
 //
@@ -11,7 +11,17 @@ import SwiftUI
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
 
-    @State private var currentIndex = 0
+    private let initialIndex: Int
+    @State private var currentIndex: Int
+
+    init(clothesStore: ClothesStore, initialIndex: Int? = nil) {
+        self.clothesStore = clothesStore
+
+        let startingIndex = initialIndex ?? max(clothesStore.clothes.count - 1, 0)
+
+        self.initialIndex = startingIndex
+        _currentIndex = State(initialValue: startingIndex)
+    }
     @State private var hoursWorn = 8.0
     @State private var environmentIndex = 2
     @State private var activityIndex = 2
@@ -78,33 +88,27 @@ struct EvaluationView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if let currentItem {
-                    evaluationContent(for: currentItem)
-                } else {
-                    ContentUnavailableView(
-                        "No Clothes",
-                        systemImage: "questionmark.circle.dashed",
-                        description: Text("Your laundry pile is empty.")
-                    )
-                }
+        Group {
+            if let currentItem {
+                evaluationContent(for: currentItem)
+            } else {
+                ContentUnavailableView(
+                    "No Clothes",
+                    systemImage: "questionmark.circle.dashed",
+                    description: Text("Your laundry pile is empty.")
+                )
             }
-            .navigationTitle("Evaluate")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                    } label: {
-                        Image(systemName: "list.dash")
-                    }
+        }
+        .navigationTitle("Evaluate")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    PileListView(
+                        clothesStore: clothesStore
+                    )
+                } label: {
+                    Image(systemName: "list.dash")
                 }
             }
         }
@@ -112,7 +116,7 @@ struct EvaluationView: View {
 
     private func evaluationContent(for item: ClothingItem) -> some View {
         ScrollView {
-            VStack(spacing: 28) {
+            VStack(spacing: 24) {
                 garmentPreview(for: item)
 
                 durationSection
@@ -124,18 +128,18 @@ struct EvaluationView: View {
                 verdictSection
             }
             .padding(.horizontal, 24)
-            .padding(.vertical, 20)
+            .padding(.vertical, 16)
         }
     }
 
     private func garmentPreview(for item: ClothingItem) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.gray.opacity(0.1))
-                .frame(width: 230, height: 230)
+                .frame(width: 240, height: 240)
                 .overlay {
                     Image(systemName: "tshirt")
-                        .font(.system(size: 70))
+                        .font(.system(size: 80))
                         .foregroundStyle(.secondary)
                 }
 
@@ -145,7 +149,7 @@ struct EvaluationView: View {
     }
 
     private var durationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Duration worn: ")
                     .font(.headline)
@@ -187,7 +191,7 @@ struct EvaluationView: View {
     }
 
     private var environmentSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Environment:")
                     .font(.headline)
@@ -206,7 +210,7 @@ struct EvaluationView: View {
                 
             }
 
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 Image(systemName: "snowflake")
                     .foregroundStyle(.secondary)
 
@@ -226,7 +230,7 @@ struct EvaluationView: View {
     }
 
     private var activitySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Activity level:")
                     .font(.headline)
@@ -244,7 +248,7 @@ struct EvaluationView: View {
                 .buttonBorderShape(.circle) // act info
             }
 
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 Image(systemName: "figure.seated.side")
                     .foregroundStyle(.secondary)
 
@@ -264,14 +268,14 @@ struct EvaluationView: View {
     }
 
     private var verdictSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Button {
                 registerDecision(washing: verdictIsWash)
             } label: {
                 Text(verdictText)
                     .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 54)
+                    .frame(height: 48)
             }
             .buttonStyle(.borderedProminent)
 
@@ -329,10 +333,10 @@ struct EvaluationView: View {
     }
 
     private func advanceToNextItem() {
-        if currentIndex + 1 < clothesStore.clothes.count {
-            currentIndex += 1
+        if currentIndex > 0 {
+            currentIndex -= 1
         } else {
-            currentIndex = 0
+            currentIndex = clothesStore.clothes.count - 1
         }
 
         hoursWorn = 8
