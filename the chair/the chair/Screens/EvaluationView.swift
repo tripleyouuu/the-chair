@@ -343,7 +343,7 @@ struct EvaluationView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.loadStuff()
+    store.seedMockData()
 
     return EvaluationView(clothesStore: store)
 }
