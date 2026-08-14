@@ -20,12 +20,6 @@ struct AddFromClosetView: View {
         self.clothesStore = clothesStore
     }
     
-    private var pages : [[ClothingItem]] {
-        stride(from: 0, to: clothesStore.closetClothes.count, by: 4).map { start in
-            Array(clothesStore.closetClothes[start..<min(start + 4, clothesStore.closetClothes.count)])
-        }
-    }
-    
     var body: some View {
             VStack{
                 closetDisplay
@@ -59,30 +53,29 @@ struct AddFromClosetView: View {
     private var closetDisplay: some View {
         ScrollView(.horizontal){
             LazyHGrid(rows: columns, spacing: 16) {
-                closetItems
-                closetItems
-                closetItems
-                closetItems
-                closetItems
-                closetItems
-                closetItems
-                closetItems
-                closetItems
+                ForEach(clothesStore.closetClothes) {
+                    garment in
+                    closetItems(garmentNickname: garment.nickname ?? "NAME DOES NOT EXIST")
+                }
             }
         }
     }
     
-    private var closetItems: some View {
-        VStack{
-            ZStack (alignment: .topTrailing){
-                Rectangle()
-                    .frame(width: 170, height: 240)
-                    .foregroundColor(Color(.systemGray5))
-                Rectangle()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(Color.accentColor)
+    struct closetItems: View {
+        let garmentNickname : String
+        
+        var body : some View {
+            VStack{
+                ZStack (alignment: .topTrailing){
+                    Rectangle()
+                        .frame(width: 170, height: 240)
+                        .foregroundColor(Color(.systemGray5))
+                    Rectangle()
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(Color.accentColor)
+                }
+                Text(garmentNickname)
             }
-            Text("Name of Clothes")
         }
     }
 }
