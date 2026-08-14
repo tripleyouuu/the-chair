@@ -330,10 +330,14 @@ struct EvaluationView: View {
         guard let currentItem else { return }
 
         if washing {
+            clothesStore.clothes[currentIndex].location = .washList
             print("\(currentItem.nickname ?? "Garment") has been added to laundry bag")
         } else {
+            clothesStore.clothes[currentIndex].location = .pile
             print("\(currentItem.nickname ?? "Garment") has been returned to the pile")
         }
+
+        clothesStore.persistence.save(clothesStore.clothes)
 
         advanceToNextItem()
     }
