@@ -54,7 +54,8 @@ struct AddFromClosetView: View {
                 if (isSelecting) {
                     ToolbarItem(placement: .bottomBar) {
                             Button {
-                                isSelecting.toggle()
+                                
+                                print(selectedGarments)
                             } label: {
                                 Text("Add to pile")
                             }.buttonStyle(.borderedProminent)
@@ -78,7 +79,7 @@ struct AddFromClosetView: View {
                         Button {
                             isListView.toggle()
                         } label: {
-                            Image(systemName: "list.dash")
+                            Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                         }
                     }
                 }
@@ -90,7 +91,7 @@ struct AddFromClosetView: View {
             LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
                 ForEach(clothesStore.closetClothes) {
                     garment in
-                    closetDisplayItems(garmentNickname: garment.nickname ?? "NAME DOES NOT EXIST")
+                    closetDisplayItems(garmentNickname: garment.nickname ?? "NAME DOES NOT EXIST", garmentID : garment.id, selectedGarments: $selectedGarments, isSelecting: $isSelecting)
                 }
             }
         }
@@ -114,17 +115,36 @@ struct AddFromClosetView: View {
     
     struct closetDisplayItems: View {
         let garmentNickname : String
+        let garmentID : UUID
+        @Binding var selectedGarments : Set<UUID>
+        @Binding var isSelecting: Bool
+        @State var isSelected: Bool = false
         var body : some View {
             VStack{
-                ZStack (alignment: .topTrailing){
-                    Rectangle()
+                ZStack (){
+                    RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
                         .frame(width: 170, height: 240)
                         .foregroundColor(Color(.systemGray5))
-                    Rectangle()
+                        .overlay(
+                            RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
+                                .strokeBorder(Color.accentColor, lineWidth: 2)
+                                .opacity(isSelected ? 1 : 0)
+                        )
+                    RoundedRectangle(cornerSize: CGSize(width: 8, height: 8))
                         .frame(width: 50, height: 50)
                         .foregroundColor(Color.accentColor)
+                        .frame(width: 150, height: 220, alignment: .topTrailing)
+                    if (isSelecting){
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                            .font(.system(size: 24))
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 150, height: 220, alignment: .bottomTrailing)
+                    }
                 }
                 Text(garmentNickname)
+            }.onTapGesture {
+                isSelected.toggle()
+                selectedGarments.insert(garmentID)
             }
         }
     }
