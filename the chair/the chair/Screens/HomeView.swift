@@ -60,7 +60,8 @@ struct HomeView: View {
             .safeAreaInset(edge: .bottom) {
                 HStack {
                     VStack(spacing: 4) {
-                        Button {
+                        NavigationLink {
+                            LaundryBasketView(clothesStore: clothesStore)
                         } label: {
                             Image(systemName: "washer")
                                 .font(.title)
