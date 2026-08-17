@@ -12,7 +12,10 @@ struct AddClothesView: View {
     @State private var clothesMaterial: ClothingMaterial = .dryFit
     @State private var clothesCategory: ClothingCategory = .top
     @State private var clothesSilhouettes: ClothingSilhouette = .tShirt
+    @State private var currentItem : ClothingItem = ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe)
     // TODO: set proper default values
+    
+    
     
     let columns = [
             GridItem(.adaptive(minimum: 100))
@@ -24,18 +27,19 @@ struct AddClothesView: View {
     
     var body: some View {
         NavigationStack{
-            VStack{
-                clothesPreview
-                TextField("Nickname", text: $clothesNickname)
-                    .textFieldStyle(.plain)
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(.infinity)
-                VStack(spacing:16){
+            VStack(spacing:20){
+                    clothesPreview
+                    TextField("Nickname", text: $clothesNickname)
+                        .textFieldStyle(.plain)
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(.infinity)
                     materialSection
                     categorySection
                     silhouetteSection
-                }
+                DisclosureGroup("Evaluate"){
+                    Text("TEST TEST TEST")
+                }.font(.title2)
             }
             .padding(20)
             .toolbar {
@@ -73,6 +77,7 @@ struct AddClothesView: View {
     private var materialSection: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("MATERIAL")
+                .font(.headline)
             LazyVGrid(columns:columns, alignment: .leading){
                 ForEach(ClothingMaterial.allCases) {
                     material in
@@ -102,6 +107,7 @@ struct AddClothesView: View {
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("CATEGORY")
+                .font(.headline)
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 150))], alignment: .leading){
                 ForEach(ClothingCategory.allCases) {
                     category in
@@ -131,6 +137,7 @@ struct AddClothesView: View {
     private var silhouetteSection: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("SILHOUETTE")
+                .font(.headline)
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 100))], alignment: .center){
                 ForEach(silhouettesOptions){
                     silhouettes in

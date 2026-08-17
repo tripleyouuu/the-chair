@@ -10,6 +10,7 @@ import Foundation
 
 final class ClothesStore: ObservableObject {
     @Published var clothes: [ClothingItem] = []
+    @Published var closetClothes: [ClothingItem] = []
 
     let persistence = ClothesPersistence()
 
@@ -21,6 +22,7 @@ final class ClothesStore: ObservableObject {
         }
     }
 
+    // TODO: make it so that data for different places are placed in separate arrays so that the pile, closet and wash clothes have different arrays
     func seedMockData() {
         clothes = [
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .pile),
@@ -30,5 +32,21 @@ final class ClothesStore: ObservableObject {
             ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .pile),
         ]
         persistence.save(clothes)
+    }
+    
+    func seedMockCloset() {
+        closetClothes = [
+            ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .wardrobe),
+            ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .wardrobe),
+            ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .wardrobe),
+            ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .wardrobe),
+            ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .wardrobe),
+            ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .wardrobe),
+            ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .wardrobe),
+            ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .wardrobe)
+        ]
+        persistence.save(closetClothes)
     }
 }
