@@ -79,7 +79,7 @@ struct EvaluationView: View {
     }
 
     private var verdictIsWash: Bool {
-        remainingWearability <= 0
+        currentItem?.needsWash ?? false
     }
 
     private var verdictText: String {
@@ -129,17 +129,38 @@ struct EvaluationView: View {
     }
 
     private func evaluationContent(for item: ClothingItem) -> some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                garmentPreview(for: item)
+        
+        // handling dem exceptions in the logic
+        
+        VStack(spacing: 0) {
+            garmentPreview(for: item)
+            
+            // i dont like that these conditions are specified both here AND in clothingitem.swift, i know it's not a big deal tho
+
+            if item.clothingMaterial == .silk {
+                silkInfoSection
+            } else if item.clothingMaterial == .dryFit {
+                dryFitInfoSection
+            } else if item.clothingColor == .white &&
+                        item.clothingMaterial != .denim &&
+                        item.clothingMaterial != .wool {
+                whiteInfoSection
+            } else {
                 durationSection
+                    .padding(.top, 24)
+
                 environmentSection
+                    .padding(.top, 24)
+
                 activitySection
-                verdictSection
+                    .padding(.top, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
+
+            verdictSection
+                .padding(.top, 24)
         }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
         .onTapGesture {
             durationFieldFocused = false
         }
@@ -177,6 +198,35 @@ struct EvaluationView: View {
             Text(item.nickname ?? "Nickname") // TODO: add auto nickname logic
                 .font(.headline)
         }
+    }
+    
+    // handling dem exceptions in the front end
+
+    private var silkInfoSection: some View {
+        Text("This garment is made of silk! In order to preserve the durability of this fabric, it is not recommended to wash it unless absolutely necessary (heavy sweat, staining, etc.)") // fuckass
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 240)
+    }
+
+    private var dryFitInfoSection: some View {
+        Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 240)
+    }
+
+    private var whiteInfoSection: some View {
+        Text("This garment is white in color. In order to preserve the brightness of the white fabric, it is recommended to wash it even after light use.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 240)
     }
 
     private var durationSection: some View {
