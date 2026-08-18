@@ -5,7 +5,6 @@
 //  Created by Vitha Watson on 12/08/26.
 //
 
-
 import SwiftUI
 
 struct EvaluationView: View {
@@ -14,7 +13,9 @@ struct EvaluationView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var currentIndex: Int
-    @State private var hoursWorn = 8.0
+    @State private var hoursWorn = 8
+    @State private var hoursWornText = "8"
+    @FocusState private var durationFieldFocused: Bool // so u can escape the keyboard
     @State private var environmentIndex = 2
     @State private var activityIndex = 2
 
@@ -63,7 +64,7 @@ struct EvaluationView: View {
 
     private var currentSession: WearSession {
         WearSession(
-            hoursWorn: hoursWorn,
+            hoursWorn: Double(hoursWorn),
             activityLevel: currentActivity,
             environment: currentEnvironment
         )
@@ -112,6 +113,7 @@ struct EvaluationView: View {
                     Image(systemName: "chevron.left")
                 }
             }
+
             // a custom back button was needed to make the go-straight-home logic work
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
@@ -138,6 +140,27 @@ struct EvaluationView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
         }
+        .onTapGesture {
+            durationFieldFocused = false
+        }
+        .onChange(of: durationFieldFocused) { _, focused in
+            if focused {
+                if hoursWornText == "8" {
+                    hoursWornText = ""
+                }
+            } else {
+                if hoursWornText.isEmpty {
+                    hoursWorn = 8
+                    hoursWornText = "8"
+                } else if let value = Int(hoursWornText) {
+                    hoursWorn = min(99, max(1, value))
+                    hoursWornText = String(hoursWorn)
+                } else {
+                    hoursWorn = 8
+                    hoursWornText = "8"
+                }
+            }
+        }
     }
 
     private func garmentPreview(for item: ClothingItem) -> some View {
@@ -159,35 +182,55 @@ struct EvaluationView: View {
     private var durationSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Duration worn: ")
+                Text("Duration worn:")
                     .font(.headline)
 
                 Spacer()
 
                 HStack(spacing: 8) {
                     Button {
-                        hoursWorn = max(0, hoursWorn - 1)
+                        hoursWorn = max(1, hoursWorn - 1)
+                        hoursWornText = String(hoursWorn)
+                        durationFieldFocused = false
                     } label: {
                         Image(systemName: "minus")
                     }
+                    .disabled(hoursWorn <= 1)
 
-                    TextField(
-                        "",
-                        value: $hoursWorn,
-                        format: .number
-                    )
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 60)
+                    TextField("", text: $hoursWornText)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 60)
+                        .focused($durationFieldFocused)
+                        .onChange(of: hoursWornText) { _, newValue in
+                            let numbersOnly = newValue.filter(\.isNumber)
+
+                            if numbersOnly != newValue {
+                                hoursWornText = numbersOnly
+                                return
+                            }
+
+                            if let value = Int(numbersOnly) {
+                                if value > 99 {
+                                    hoursWornText = "99"
+                                    hoursWorn = 99
+                                } else {
+                                    hoursWorn = value
+                                }
+                            }
+                        }
 
                     Button {
-                        hoursWorn += 1
+                        hoursWorn = min(99, hoursWorn + 1)
+                        hoursWornText = String(hoursWorn)
+                        durationFieldFocused = false
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .disabled(hoursWorn >= 99)
                 }
                 
-                Text("     hours") // lmao
+                Text("     hours")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
@@ -330,10 +373,14 @@ struct EvaluationView: View {
         guard let currentItem else { return }
 
         if washing {
+            clothesStore.clothes[currentIndex].location = .washList
             print("\(currentItem.nickname ?? "Garment") has been added to laundry bag")
         } else {
+            clothesStore.clothes[currentIndex].location = .pile
             print("\(currentItem.nickname ?? "Garment") has been returned to the pile")
         }
+
+        clothesStore.persistence.save(clothesStore.clothes)
 
         advanceToNextItem()
     }
@@ -346,6 +393,8 @@ struct EvaluationView: View {
         }
 
         hoursWorn = 8
+        hoursWornText = "8"
+        durationFieldFocused = false
         environmentIndex = 2
         activityIndex = 2
     }
