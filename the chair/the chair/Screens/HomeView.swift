@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
@@ -79,10 +79,15 @@ struct HomeView: View {
 
                     VStack(spacing: 4) {
                         Menu {
-                            Button("Add new") {
+                            NavigationLink{
+                                AddClothesView()
+                            } label : {
+                                Text("Add new")
                             }
-
-                            Button("Add from closet") {
+                            NavigationLink{
+                                AddFromClosetView(clothesStore: clothesStore)
+                            } label : {
+                                Text("Add from closet")
                             }
                         } label: {
                             Image(systemName: "plus")
@@ -107,6 +112,6 @@ struct HomeView: View {
 #Preview {
     let store = ClothesStore()
     store.seedMockData()
-
+    store.seedMockCloset()
     return HomeView(clothesStore: store)
 }

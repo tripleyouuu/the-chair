@@ -12,6 +12,7 @@ struct AddClothesView: View {
     @State private var clothesMaterial: ClothingMaterial = .dryFit
     @State private var clothesCategory: ClothingCategory = .top
     @State private var clothesSilhouettes: ClothingSilhouette = .tShirt
+    @Environment(\.dismiss) private var dismiss
     // TODO: set proper default values
     
     
@@ -25,7 +26,6 @@ struct AddClothesView: View {
     }
     
     var body: some View {
-        NavigationStack{
             VStack(spacing:20){
                     clothesPreview
                     TextField("Nickname", text: $clothesNickname)
@@ -39,21 +39,14 @@ struct AddClothesView: View {
             }
             .padding(20)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                }
-
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        dismiss()
                     } label: {
                         Image(systemName: "checkmark")
                     }.buttonStyle(.borderedProminent)
                 }
             }
-        }
     }
     
     private var clothesPreview : some View {
@@ -143,7 +136,7 @@ struct AddClothesView: View {
                     }){
                         ZStack{
                             Rectangle()
-                                .frame(width: .infinity, height:120)
+                                .frame(height:120)
                                 .foregroundStyle(clothesSilhouettes == silhouettes ? Color.accentColor : Color(.systemGray5))
                                 .cornerRadius(16)
 //                                    Image(systemName: "tshirt.fill")
@@ -160,7 +153,7 @@ struct AddClothesView: View {
 
                     }
                 }
-            }.frame(width: .infinity)
+            }
         }
     }
 }
@@ -168,5 +161,7 @@ struct AddClothesView: View {
 #Preview {
     let store = ClothesStore()
     store.seedMockData()
-    return AddClothesView()
+    return NavigationStack {
+        AddClothesView()
+    }
 }

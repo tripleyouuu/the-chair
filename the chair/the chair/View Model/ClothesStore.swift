@@ -34,6 +34,7 @@ final class ClothesStore: ObservableObject {
         persistence.save(clothes)
     }
     
+    // TODO: delete this function later
     func seedMockCloset() {
         closetClothes = [
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
