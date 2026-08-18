@@ -58,12 +58,34 @@ struct ClothingItem: Identifiable, Codable {
     }
 
     var needsWash: Bool {
+        if clothingMaterial == .silk {
+            return false // fuckass
+        }
+
+        if clothingMaterial == .dryFit {
+            return true
+        }
+
+        if clothingColor == .white &&
+            clothingMaterial != .denim &&
+            clothingMaterial != .wool &&
+            clothingMaterial != .silk
+        {
+            return true
+        }
+
         guard !wearSessions.isEmpty else { return false }
         return wearabilityRemaining <= 0
     }
 
-    // Wash the instant it's worn (dry-fit, silk, white-on-non-denim/wool) 
+    // Wash the instant it's worn (dry-fit or white-on-non-denim/wool/silk)
     var isUrgentWash: Bool {
         needsWash && totalWearability == 0
     }
 }
+
+
+// notes: rn, ignoring cross-session persistence stuff,
+// there is wearabilityRemaining (which is total - used wearability),
+// but this is only used if the garment passes the edge case tests in needsWash.
+// i'm not sure what isUrgentWash is or if it's still needed tho, @ Aurora pls check i just updated the comment haha
