@@ -39,6 +39,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .padding(.horizontal, 24)
+                    .disabled(clothesStore.pile.isEmpty)
 
                     Text("The Chair isn't the problem, it's the solution!")
                         .font(.caption)

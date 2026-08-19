@@ -31,6 +31,8 @@ extension ClothesStore {
             guard itemIDs.contains(item.id) else { return false }
             var moved = item
             moved.location = .washList
+            moved.savedEvaluation = nil
+            moved.location = .washList
             movedItems.append(moved)
             return true
         }
@@ -45,6 +47,7 @@ extension ClothesStore {
         washList.removeAll { item in
             guard itemIDs.contains(item.id) else { return false }
             var washed = item
+            washed.savedEvaluation = nil
             washed.wearSessions.removeAll()
             washed.location = .wardrobe
             movedItems.append(washed)

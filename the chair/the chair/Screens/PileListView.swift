@@ -9,6 +9,7 @@ import SwiftUI
 struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
     @Binding var currentIndex: Int
+    @Binding var selectionVersion: Int
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -20,6 +21,7 @@ struct PileListView: View {
                 ) { index, item in
                     Button {
                         currentIndex = index
+                        selectionVersion += 1
                         dismiss()
                     } label: {
                         HStack {
@@ -58,7 +60,8 @@ struct PileListView: View {
     NavigationStack {
         PileListView(
             clothesStore: store,
-            currentIndex: .constant(store.pile.count - 1)
+            currentIndex: .constant(store.pile.count - 1),
+            selectionVersion: .constant(0)
         )
     }
 }
