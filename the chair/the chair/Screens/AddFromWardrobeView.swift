@@ -140,11 +140,14 @@ struct AddFromClosetView: View {
                     GarmentIconView(item: garment)
                         .frame(width: 120, height: 120)
 
-                    RoundedRectangle(cornerSize: CGSize(width: 8, height: 8))
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(Color.accentColor)
-                        .frame(width: 150, height: 220, alignment: .topTrailing)
-                    if (isSelecting){
+                    if garment.referenceImageName != nil {
+                        RoundedRectangle(cornerRadius: 8)
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(Color.accentColor)
+                            .frame(width: 150, height: 220, alignment: .topTrailing)
+                    }
+
+                    if (isSelecting) {
                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 24))
                             .foregroundStyle(Color.accentColor)

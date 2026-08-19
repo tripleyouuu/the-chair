@@ -15,6 +15,7 @@ struct ClothingItem: Identifiable, Codable {
     var silhouette: ClothingSilhouette
     var location: ClothingLocation
     var wearSessions: [WearSession]
+    var referenceImageName: String?
 
     init(
         id: UUID = UUID(),
@@ -23,7 +24,8 @@ struct ClothingItem: Identifiable, Codable {
         clothingColor: ClothingColor,
         silhouette: ClothingSilhouette,
         location: ClothingLocation = .pile,
-        wearSessions: [WearSession] = []
+        wearSessions: [WearSession] = [],
+        referenceImageName: String? = nil
     ) {
         self.id = id
         self.nickname = nickname
@@ -32,6 +34,7 @@ struct ClothingItem: Identifiable, Codable {
         self.silhouette = silhouette
         self.location = location
         self.wearSessions = wearSessions
+        self.referenceImageName = referenceImageName
     }
 
     // A silhouette only belongs to one category
