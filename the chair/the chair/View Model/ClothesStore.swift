@@ -26,7 +26,7 @@ final class ClothesStore: ObservableObject {
     func seedMockData() {
         clothes = [
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .pile),
-            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .pile),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .darkBlue, silhouette: .pants, location: .pile),
             ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .pile),
             ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .pile),
             ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .pile),
@@ -38,12 +38,12 @@ final class ClothesStore: ObservableObject {
     func seedMockCloset() {
         closetClothes = [
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
-            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .wardrobe),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .darkBlue, silhouette: .pants, location: .wardrobe),
             ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .wardrobe),
             ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .wardrobe),
             ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .wardrobe),
             ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
-            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .wardrobe),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .darkBlue, silhouette: .pants, location: .wardrobe),
             ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .wardrobe),
             ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .wardrobe),
             ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .wardrobe)
