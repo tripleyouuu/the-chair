@@ -29,20 +29,58 @@ final class ClothesStore: ObservableObject {
 
     private func seedMockData() {
         pile = [
-            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .darkBlue, silhouette: .pants, location: .pile),
-            ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .pile),
+            ClothingItem(
+                nickname: "Work Jeans",
+                clothingMaterial: .denim,
+                clothingColor: .darkBlue,
+                silhouette: .pants,
+                location: .pile
+            ),
+            ClothingItem(
+                nickname: "Sunday Sweater",
+                clothingMaterial: .wool,
+                clothingColor: .gray,
+                silhouette: .hoodie,
+                location: .pile
+            )
         ]
+
         closet = [
-            ClothingItem(nickname: "Everyday Tee", clothingMaterial: .natural, clothingColor: .white, silhouette: .tShirt, location: .wardrobe),
-            ClothingItem(nickname: "Rain Jacket", clothingMaterial: .synthetic, clothingColor: .black, silhouette: .jacket, location: .wardrobe),
+            ClothingItem(
+                nickname: "Everyday Tee",
+                clothingMaterial: .natural,
+                clothingColor: .white,
+                silhouette: .tShirt,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Rain Jacket",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .jacket,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            )
         ]
+
         washList = [
-            ClothingItem(nickname: "Slip Dress", clothingMaterial: .silk, clothingColor: .red, silhouette: .dress, location: .washList),
+            ClothingItem(
+                nickname: "Slip Dress",
+                clothingMaterial: .silk,
+                clothingColor: .red,
+                silhouette: .dress,
+                location: .washList
+            )
         ]
         savePersistence()
     }
 
     func savePersistence() {
-        persistence.save(pile: pile, closet: closet, washList: washList)
+        persistence.save(
+            pile: pile,
+            closet: closet,
+            washList: washList
+        )
     }
 }

@@ -12,7 +12,7 @@ struct AddFromClosetView: View {
     @State var searchTeam : String = ""
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
-    @State private var isSelecting = false
+    @State private var isSelecting = true
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -53,35 +53,37 @@ struct AddFromClosetView: View {
             .toolbar {
                 if (isSelecting) {
                     ToolbarItem(placement: .bottomBar) {
-                            Button {
-                                clothesStore.addToPile(Array(selectedGarments))
-                                selectedGarments.removeAll()
-                                isSelecting = false
-                            } label: {
-                                Text("Add to pile")
-                            }.buttonStyle(.borderedProminent)
-                        }
-                    ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                isSelecting.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                } else {
-                    ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                isSelecting.toggle()
-                            } label: {
-                                Text("Select")
-                            }
-                        }
+                        Button {
+                            clothesStore.addToPile(Array(selectedGarments))
+                            selectedGarments.removeAll()
+                            isSelecting = false
+                        } label: {
+                            Text("Add to pile")
+                        }.buttonStyle(.borderedProminent)
+                    }
+
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            isListView.toggle()
+                            isSelecting.toggle()
                         } label: {
-                            Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                            Image(systemName: "xmark")
                         }
+                    }
+                } else {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isSelecting.toggle()
+                        } label: {
+                            Text("Select")
+                        }
+                    }
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isListView.toggle()
+                    } label: {
+                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                     }
                 }
             }
@@ -139,11 +141,12 @@ struct AddFromClosetView: View {
 
                     GarmentIconView(item: garment)
                         .frame(width: 120, height: 120)
-
-                    if garment.referenceImageName != nil {
-                        RoundedRectangle(cornerRadius: 8)
+                    if let referenceImageName = garment.referenceImageName {
+                        Image(referenceImageName)
+                            .resizable()
+                            .scaledToFill()
                             .frame(width: 50, height: 50)
-                            .foregroundColor(Color.accentColor)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .frame(width: 150, height: 220, alignment: .topTrailing)
                     }
 
