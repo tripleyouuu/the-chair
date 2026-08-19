@@ -25,7 +25,7 @@ struct EvaluationView: View {
     ) {
         self.clothesStore = clothesStore
 
-        let startingIndex = initialIndex ?? max(clothesStore.clothes.count - 1, 0)
+        let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
     }
 
@@ -46,12 +46,12 @@ struct EvaluationView: View {
     ]
 
     private var currentItem: ClothingItem? {
-        guard !clothesStore.clothes.isEmpty,
-              currentIndex < clothesStore.clothes.count else {
+        guard !clothesStore.pile.isEmpty,
+              currentIndex < clothesStore.pile.count else {
             return nil
         }
 
-        return clothesStore.clothes[currentIndex]
+        return clothesStore.pile[currentIndex]
     }
 
     private var currentEnvironment: EnvironmentLevel {
@@ -79,7 +79,7 @@ struct EvaluationView: View {
     }
 
     private var verdictIsWash: Bool {
-        currentItem?.needsWash ?? false
+        remainingWearability <= 0
     }
 
     private var verdictText: String {
@@ -129,38 +129,17 @@ struct EvaluationView: View {
     }
 
     private func evaluationContent(for item: ClothingItem) -> some View {
-        
-        // handling dem exceptions in the logic
-        
-        VStack(spacing: 0) {
-            garmentPreview(for: item)
-            
-            // i dont like that these conditions are specified both here AND in clothingitem.swift, i know it's not a big deal tho
-
-            if item.clothingMaterial == .silk {
-                silkInfoSection
-            } else if item.clothingMaterial == .dryFit {
-                dryFitInfoSection
-            } else if item.clothingColor == .white &&
-                        item.clothingMaterial != .denim &&
-                        item.clothingMaterial != .wool {
-                whiteInfoSection
-            } else {
+        ScrollView {
+            VStack(spacing: 24) {
+                garmentPreview(for: item)
                 durationSection
-                    .padding(.top, 24)
-
                 environmentSection
-                    .padding(.top, 24)
-
                 activitySection
-                    .padding(.top, 24)
+                verdictSection
             }
-
-            verdictSection
-                .padding(.top, 24)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 16)
         .onTapGesture {
             durationFieldFocused = false
         }
@@ -198,35 +177,6 @@ struct EvaluationView: View {
             Text(item.nickname ?? "Nickname") // TODO: add auto nickname logic
                 .font(.headline)
         }
-    }
-    
-    // handling dem exceptions in the front end
-
-    private var silkInfoSection: some View {
-        Text("This garment is made of silk! In order to preserve the durability of this fabric, it is not recommended to wash it unless absolutely necessary (heavy sweat, staining, etc.)") // fuckass
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .frame(height: 240)
-    }
-
-    private var dryFitInfoSection: some View {
-        Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .frame(height: 240)
-    }
-
-    private var whiteInfoSection: some View {
-        Text("This garment is white in color. In order to preserve the brightness of the white fabric, it is recommended to wash it even after light use.")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .frame(height: 240)
     }
 
     private var durationSection: some View {
@@ -423,14 +373,11 @@ struct EvaluationView: View {
         guard let currentItem else { return }
 
         if washing {
-            clothesStore.clothes[currentIndex].location = .washList
+            clothesStore.sendToLaundry([currentItem.id])
             print("\(currentItem.nickname ?? "Garment") has been added to laundry bag")
         } else {
-            clothesStore.clothes[currentIndex].location = .pile
-            print("\(currentItem.nickname ?? "Garment") has been returned to the pile")
+            print("\(currentItem.nickname ?? "Garment") stays in the pile")
         }
-
-        clothesStore.persistence.save(clothesStore.clothes)
 
         advanceToNextItem()
     }
@@ -439,7 +386,7 @@ struct EvaluationView: View {
         if currentIndex > 0 {
             currentIndex -= 1
         } else {
-            currentIndex = clothesStore.clothes.count - 1
+            currentIndex = clothesStore.pile.count - 1
         }
 
         hoursWorn = 8
@@ -452,9 +399,8 @@ struct EvaluationView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockData()
 
-    return NavigationStack {
+    NavigationStack {
         EvaluationView(clothesStore: store)
     }
 }
