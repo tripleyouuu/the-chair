@@ -51,7 +51,6 @@ struct AddFromClosetView: View {
                 }
             }
             .toolbar {
-                if (isSelecting) {
                     ToolbarItem(placement: .bottomBar) {
                         Button {
                             clothesStore.addToPile(Array(selectedGarments))
@@ -61,24 +60,6 @@ struct AddFromClosetView: View {
                             Text("Add to pile")
                         }.buttonStyle(.borderedProminent)
                     }
-
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isSelecting.toggle()
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                    }
-                } else {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isSelecting.toggle()
-                        } label: {
-                            Text("Select")
-                        }
-                    }
-                }
-
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isListView.toggle()
@@ -126,7 +107,9 @@ struct AddFromClosetView: View {
         let garment: ClothingItem
         @Binding var selectedGarments: Set<UUID>
         @Binding var isSelecting: Bool
-        @State var isSelected: Bool = false
+        private var isSelected: Bool {
+            selectedGarments.contains(garment.id)
+        }
         var body : some View {
             VStack{
                 ZStack (){
@@ -160,8 +143,12 @@ struct AddFromClosetView: View {
 
                 Text(garment.nickname ?? "NAME DOES NOT EXIST")
             }.onTapGesture {
-                isSelected.toggle()
-                selectedGarments.insert(garment.id)
+                if (isSelected) {
+                    selectedGarments.remove(garment.id)
+                } else {
+                    selectedGarments.insert(garment.id)
+                }
+
             }
         }
     }
