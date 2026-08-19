@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct SavedEvaluation: Codable {
+    let hoursWorn: Int
+    let environmentIndex: Int
+    let activityIndex: Int
+}
+
 struct ClothingItem: Identifiable, Codable {
     let id: UUID
     var nickname: String?
@@ -16,6 +22,7 @@ struct ClothingItem: Identifiable, Codable {
     var location: ClothingLocation
     var wearSessions: [WearSession]
     var referenceImageName: String?
+    var savedEvaluation: SavedEvaluation?
 
     init(
         id: UUID = UUID(),
@@ -25,7 +32,8 @@ struct ClothingItem: Identifiable, Codable {
         silhouette: ClothingSilhouette,
         location: ClothingLocation = .pile,
         wearSessions: [WearSession] = [],
-        referenceImageName: String? = nil
+        referenceImageName: String? = nil,
+        savedEvaluation: SavedEvaluation? = nil
     ) {
         self.id = id
         self.nickname = nickname
@@ -35,6 +43,7 @@ struct ClothingItem: Identifiable, Codable {
         self.location = location
         self.wearSessions = wearSessions
         self.referenceImageName = referenceImageName
+        self.savedEvaluation = savedEvaluation
     }
 
     // A silhouette only belongs to one category

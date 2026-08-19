@@ -18,7 +18,10 @@ struct EvaluationView: View {
     @FocusState private var durationFieldFocused: Bool // so u can escape the keyboard
     @State private var environmentIndex = 2
     @State private var activityIndex = 2
-
+    @State private var sessionVisitedIDs: Set<UUID> = []
+    @State private var sessionStarted = false
+    @State private var currentItemIsRevisit = false
+    @State private var selectionVersion = 0
     init(
         clothesStore: ClothesStore,
         initialIndex: Int? = nil
@@ -27,6 +30,78 @@ struct EvaluationView: View {
 
         let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
+    }
+    
+    // persistence and session experimentation
+    private func loadItem(at index: Int, revisited: Bool) {
+        guard index >= 0, index < clothesStore.pile.count else {
+            finishSession()
+            return
+        }
+
+        let item = clothesStore.pile[index]
+
+        currentIndex = index
+        currentItemIsRevisit = revisited
+        sessionVisitedIDs.insert(item.id)
+
+        if let saved = item.savedEvaluation {
+            hoursWorn = saved.hoursWorn
+            hoursWornText = String(saved.hoursWorn)
+            environmentIndex = saved.environmentIndex
+            activityIndex = saved.activityIndex
+        } else {
+            hoursWorn = 8
+            hoursWornText = "8"
+            environmentIndex = 2
+            activityIndex = 2
+        }
+
+        durationFieldFocused = false
+    }
+    
+    private func startSession() {
+        guard !sessionStarted else { return }
+
+        sessionStarted = true
+        sessionVisitedIDs.removeAll()
+
+        guard !clothesStore.pile.isEmpty else {
+            finishSession()
+            return
+        }
+
+        loadItem(
+            at: currentIndex,
+            revisited: false
+        )
+    }
+    
+    private func finishSession() {
+        sessionStarted = false
+        sessionVisitedIDs.removeAll()
+        dismiss()
+    }
+    
+    private func advanceToNextItem() {
+        let nextIndex = clothesStore.pile.indices.reversed().first {
+            !sessionVisitedIDs.contains(clothesStore.pile[$0].id)
+        }
+
+        guard let nextIndex else {
+            finishSession()
+            return
+        }
+
+        loadItem(
+            at: nextIndex,
+            revisited: false
+        )
+    }
+    
+    private var evaluationIsLocked: Bool {
+        guard let item = currentItem else { return false }
+        return item.savedEvaluation != nil && !currentItemIsRevisit
     }
 
     private let environments: [EnvironmentLevel] = [
@@ -108,7 +183,7 @@ struct EvaluationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    dismiss()
+                    finishSession()
                 } label: {
                     Image(systemName: "chevron.left")
                 }
@@ -119,12 +194,25 @@ struct EvaluationView: View {
                 NavigationLink {
                     PileListView(
                         clothesStore: clothesStore,
-                        currentIndex: $currentIndex
+                        currentIndex: $currentIndex,
+                        selectionVersion: $selectionVersion
                     )
                 } label: {
                     Image(systemName: "list.dash")
                 }
             }
+        }
+        .onAppear {
+            startSession()
+        }
+        .onChange(of: selectionVersion) { _, _ in
+            guard let currentItem else { return }
+            let wasAlreadyVisited = sessionVisitedIDs.contains(currentItem.id)
+
+            loadItem(
+                at: currentIndex,
+                revisited: wasAlreadyVisited
+            )
         }
     }
 
@@ -194,7 +282,7 @@ struct EvaluationView: View {
                     } label: {
                         Image(systemName: "minus")
                     }
-                    .disabled(hoursWorn <= 1)
+                    .disabled(hoursWorn <= (currentItem?.savedEvaluation?.hoursWorn ?? 1) || evaluationIsLocked) // cant reduce in later evals lah
 
                     TextField("", text: $hoursWornText)
                         .keyboardType(.numberPad)
@@ -210,11 +298,14 @@ struct EvaluationView: View {
                             }
 
                             if let value = Int(numbersOnly) {
-                                if value > 99 {
-                                    hoursWornText = "99"
-                                    hoursWorn = 99
-                                } else {
-                                    hoursWorn = value
+                                let minimum = evaluationIsLocked
+                                    ? (currentItem?.savedEvaluation?.hoursWorn ?? 1)
+                                    : 1
+
+                                hoursWorn = min(99, max(minimum, value))
+
+                                if evaluationIsLocked {
+                                    hoursWornText = String(hoursWorn)
                                 }
                             }
                         }
@@ -265,7 +356,16 @@ struct EvaluationView: View {
                 Slider(
                     value: Binding(
                         get: { Double(environmentIndex) },
-                        set: { environmentIndex = Int($0.rounded()) }
+                        set: {
+                            if evaluationIsLocked {
+                                environmentIndex = max(
+                                    currentItem?.savedEvaluation?.environmentIndex ?? 0,
+                                    Int($0.rounded())
+                                )
+                            } else {
+                                environmentIndex = Int($0.rounded())
+                            }
+                        }
                     ),
                     in: 0...4,
                     step: 1
@@ -303,12 +403,20 @@ struct EvaluationView: View {
                 Slider(
                     value: Binding(
                         get: { Double(activityIndex) },
-                        set: { activityIndex = Int($0.rounded()) }
+                        set: {
+                            if evaluationIsLocked {
+                                activityIndex = max(
+                                    currentItem?.savedEvaluation?.activityIndex ?? 0,
+                                    Int($0.rounded())
+                                )
+                            } else {
+                                activityIndex = Int($0.rounded())
+                            }
+                        }
                     ),
                     in: 0...4,
                     step: 1
                 )
-
                 Image(systemName: "figure.run")
                     .foregroundStyle(.secondary)
             }
@@ -369,31 +477,38 @@ struct EvaluationView: View {
     }
 
     private func registerDecision(washing: Bool) {
-        guard let currentItem else { return }
+        guard currentIndex < clothesStore.pile.count else { return }
+
+        let currentItem = clothesStore.pile[currentIndex]
 
         if washing {
             clothesStore.sendToLaundry([currentItem.id])
-            print("\(currentItem.nickname ?? "Garment") has been added to laundry bag")
         } else {
-            print("\(currentItem.nickname ?? "Garment") stays in the pile")
+            clothesStore.pile[currentIndex].savedEvaluation = SavedEvaluation(
+                hoursWorn: hoursWorn,
+                environmentIndex: environmentIndex,
+                activityIndex: activityIndex
+            )
+
+            clothesStore.savePersistence()
         }
 
         advanceToNextItem()
     }
 
-    private func advanceToNextItem() {
-        if currentIndex > 0 {
-            currentIndex -= 1
-        } else {
-            currentIndex = clothesStore.pile.count - 1
-        }
-
-        hoursWorn = 8
-        hoursWornText = "8"
-        durationFieldFocused = false
-        environmentIndex = 2
-        activityIndex = 2
-    }
+//    private func advanceToNextItem() {
+//        if currentIndex > 0 {
+//            currentIndex -= 1
+//        } else {
+//            currentIndex = clothesStore.pile.count - 1
+//        }
+//
+//        hoursWorn = 8
+//        hoursWornText = "8"
+//        durationFieldFocused = false
+//        environmentIndex = 2
+//        activityIndex = 2
+//    }
 }
 
 #Preview {
