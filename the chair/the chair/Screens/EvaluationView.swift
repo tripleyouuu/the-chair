@@ -169,9 +169,8 @@ struct EvaluationView: View {
                 .fill(Color.gray.opacity(0.1))
                 .frame(width: 240, height: 240)
                 .overlay {
-                    Image(systemName: "tshirt")
-                        .font(.system(size: 80))
-                        .foregroundStyle(.secondary)
+                    GarmentIconView(item: item)
+                        .frame(width: 160, height: 160)
                 }
 
             Text(item.nickname ?? "Nickname") // TODO: add auto nickname logic

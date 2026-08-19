@@ -26,9 +26,7 @@ struct LaundryBasketView: View {
                 List {
                     ForEach(laundryItems) { item in
                         HStack(spacing: 16) {
-                            Image(systemName: "tshirt")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
+                            GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
                                 .background(.gray.opacity(0.1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -84,7 +82,6 @@ struct LaundryBasketView: View {
             Button("Confirm", role: .destructive) {
                 clothesStore.finishWashing(clothesStore.washList.map(\.id))
             }
-
             Button("Cancel", role: .cancel) {
             }
         } message: {

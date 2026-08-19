@@ -29,7 +29,7 @@ final class ClothesStore: ObservableObject {
 
     private func seedMockData() {
         pile = [
-            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .blue, silhouette: .pants, location: .pile),
+            ClothingItem(nickname: "Work Jeans", clothingMaterial: .denim, clothingColor: .darkBlue, silhouette: .pants, location: .pile),
             ClothingItem(nickname: "Sunday Sweater", clothingMaterial: .wool, clothingColor: .gray, silhouette: .hoodie, location: .pile),
         ]
         closet = [

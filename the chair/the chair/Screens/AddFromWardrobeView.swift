@@ -37,7 +37,7 @@ struct AddFromClosetView: View {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundStyle(.gray)
                                     TextField("Search", text: $searchTeam)
-                                  }
+                                }
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(.infinity)
@@ -96,7 +96,11 @@ struct AddFromClosetView: View {
             LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
                 ForEach(searchedCloset) {
                     garment in
-                    closetDisplayItems(garmentNickname: garment.nickname ?? "NAME DOES NOT EXIST", garmentID : garment.id, selectedGarments: $selectedGarments, isSelecting: $isSelecting)
+                    closetDisplayItems(
+                        garment: garment,
+                        selectedGarments: $selectedGarments,
+                        isSelecting: $isSelecting
+                    )
                 }
             }
         }
@@ -106,9 +110,7 @@ struct AddFromClosetView: View {
         List(searchedCloset, selection: $selectedGarments){
             garment in
             HStack{
-                Image(systemName: "tshirt")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                GarmentIconView(item: garment)
                     .frame(width: 56, height: 56)
                     .background(.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -119,9 +121,8 @@ struct AddFromClosetView: View {
     }
     
     struct closetDisplayItems: View {
-        let garmentNickname : String
-        let garmentID : UUID
-        @Binding var selectedGarments : Set<UUID>
+        let garment: ClothingItem
+        @Binding var selectedGarments: Set<UUID>
         @Binding var isSelecting: Bool
         @State var isSelected: Bool = false
         var body : some View {
@@ -135,6 +136,10 @@ struct AddFromClosetView: View {
                                 .strokeBorder(Color.accentColor, lineWidth: 2)
                                 .opacity(isSelected ? 1 : 0)
                         )
+
+                    GarmentIconView(item: garment)
+                        .frame(width: 120, height: 120)
+
                     RoundedRectangle(cornerSize: CGSize(width: 8, height: 8))
                         .frame(width: 50, height: 50)
                         .foregroundColor(Color.accentColor)
@@ -146,10 +151,11 @@ struct AddFromClosetView: View {
                             .frame(width: 150, height: 220, alignment: .bottomTrailing)
                     }
                 }
-                Text(garmentNickname)
+
+                Text(garment.nickname ?? "NAME DOES NOT EXIST")
             }.onTapGesture {
                 isSelected.toggle()
-                selectedGarments.insert(garmentID)
+                selectedGarments.insert(garment.id)
             }
         }
     }
