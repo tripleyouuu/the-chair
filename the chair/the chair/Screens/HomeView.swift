@@ -80,7 +80,7 @@ struct HomeView: View {
                     VStack(spacing: 4) {
                         Menu {
                             NavigationLink{
-                                AddClothesView()
+                                AddClothesView(clothesStore: clothesStore)
                             } label : {
                                 Text("Add new")
                             }
