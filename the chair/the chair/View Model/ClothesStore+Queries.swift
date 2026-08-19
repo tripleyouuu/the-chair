@@ -8,36 +8,50 @@
 import Foundation
 
 extension ClothesStore {
-    // Pile Verdict, currently-tracked items need a wash right now.
+    
+    var allClothes: [ClothingItem] { pile + closet + washList }
+
+    // Pile Verdict
     func itemsNeedingWash() -> [ClothingItem] {
-        clothes.filter { $0.needsWash }
+        allClothes.filter { $0.needsWash }
     }
 
-    // wash-every-wear materials/colors
+    // Subset of itemsNeedingWash that can't wait
     func urgentWashItems() -> [ClothingItem] {
-        clothes.filter { $0.isUrgentWash }
+        allClothes.filter { $0.isUrgentWash }
     }
 
     // Add to Clothes Never Worn Before
     func neverWornItems() -> [ClothingItem] {
-        clothes.filter { $0.wearSessions.isEmpty }
+        allClothes.filter { $0.wearSessions.isEmpty }
     }
 
-    // Filtered Wardrobe by category, color, or silhouette.
+    // Filtered Wardrobe 
     func items(in category: ClothingCategory) -> [ClothingItem] {
-        clothes.filter { $0.clothingCategory == category }
+        allClothes.filter { $0.clothingCategory == category }
     }
 
     func items(withColor color: ClothingColor) -> [ClothingItem] {
-        clothes.filter { $0.clothingColor == color }
+        allClothes.filter { $0.clothingColor == color }
     }
 
     func items(withSilhouette silhouette: ClothingSilhouette) -> [ClothingItem] {
-        clothes.filter { $0.silhouette == silhouette }
+        allClothes.filter { $0.silhouette == silhouette }
     }
 
-    // Items sitting in a specific location (Pile, Washing List, or Wardrobe)
-    func items(in location: ClothingLocation) -> [ClothingItem] {
-        clothes.filter { $0.location == location }
+    // Search 
+    func search(_ query: String, within items: [ClothingItem]) -> [ClothingItem] {
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !needle.isEmpty else { return items }
+
+        return items.filter { item in
+            let nicknameWords = (item.nickname ?? "").lowercased().split(separator: " ")
+            if nicknameWords.contains(where: { $0.hasPrefix(needle) }) {
+                return true
+            }
+            return item.clothingColor.rawValue.lowercased().contains(needle)
+                || item.silhouette.rawValue.lowercased().contains(needle)
+                || item.clothingMaterial.rawValue.lowercased().contains(needle)
+        }
     }
 }

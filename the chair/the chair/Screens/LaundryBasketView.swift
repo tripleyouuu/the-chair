@@ -13,7 +13,7 @@ struct LaundryBasketView: View {
     @State private var showClearAlert = false
 
     private var laundryItems: [ClothingItem] {
-        clothesStore.clothes.filter { $0.location == .washList }
+        clothesStore.washList
     }
 
     var body: some View {
@@ -26,9 +26,7 @@ struct LaundryBasketView: View {
                 List {
                     ForEach(laundryItems) { item in
                         HStack(spacing: 16) {
-                            Image(systemName: "tshirt")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
+                            GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
                                 .background(.gray.opacity(0.1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -54,7 +52,7 @@ struct LaundryBasketView: View {
                         .listRowBackground(Color.clear)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
-                                removeFromLaundry(item)
+                                clothesStore.finishWashing([item.id])
                             } label: {
                                 Image(systemName: "drop.degreesign")
                             }
@@ -82,9 +80,8 @@ struct LaundryBasketView: View {
         }
         .alert("Clear laundry basket", isPresented: $showClearAlert) {
             Button("Confirm", role: .destructive) {
-                clearLaundryBasket()
+                clothesStore.finishWashing(clothesStore.washList.map(\.id))
             }
-
             Button("Cancel", role: .cancel) {
             }
         } message: {
@@ -92,34 +89,12 @@ struct LaundryBasketView: View {
         }
     }
 
-    private func removeFromLaundry(_ item: ClothingItem) {
-        guard let index = clothesStore.clothes.firstIndex(where: { $0.id == item.id }) else {
-            return
-        }
-
-        clothesStore.clothes[index].location = .wardrobe
-        clothesStore.persistence.save(clothesStore.clothes)
-
-        print("\(item.nickname ?? "Garment") has been returned to the closet.")
-    }
-
-    private func clearLaundryBasket() {
-        for index in clothesStore.clothes.indices {
-            if clothesStore.clothes[index].location == .washList {
-                print("\(clothesStore.clothes[index].nickname ?? "Garment") has been returned to the closet.")
-                clothesStore.clothes[index].location = .wardrobe
-            }
-        }
-
-        clothesStore.persistence.save(clothesStore.clothes)
-    }
 }
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockData()
 
-    return NavigationStack {
+    NavigationStack {
         LaundryBasketView(clothesStore: store)
     }
 }

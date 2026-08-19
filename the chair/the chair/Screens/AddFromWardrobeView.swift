@@ -12,7 +12,7 @@ struct AddFromClosetView: View {
     @State var searchTeam : String = ""
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
-    @State private var isSelecting = false
+    @State private var isSelecting = true
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -37,7 +37,7 @@ struct AddFromClosetView: View {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundStyle(.gray)
                                     TextField("Search", text: $searchTeam)
-                                  }
+                                }
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(.infinity)
@@ -53,57 +53,66 @@ struct AddFromClosetView: View {
             .toolbar {
                 if (isSelecting) {
                     ToolbarItem(placement: .bottomBar) {
-                            Button {
-                                
-                                print(selectedGarments)
-                            } label: {
-                                Text("Add to pile")
-                            }.buttonStyle(.borderedProminent)
-                        }
-                    ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                isSelecting.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                } else {
-                    ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                isSelecting.toggle()
-                            } label: {
-                                Text("Select")
-                            }
-                        }
+                        Button {
+                            clothesStore.addToPile(Array(selectedGarments))
+                            selectedGarments.removeAll()
+                            isSelecting = false
+                        } label: {
+                            Text("Add to pile")
+                        }.buttonStyle(.borderedProminent)
+                    }
+
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            isListView.toggle()
+                            isSelecting.toggle()
                         } label: {
-                            Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                            Image(systemName: "xmark")
                         }
+                    }
+                } else {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isSelecting.toggle()
+                        } label: {
+                            Text("Select")
+                        }
+                    }
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isListView.toggle()
+                    } label: {
+                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                     }
                 }
             }
     }
     
+    private var searchedCloset: [ClothingItem] {
+        clothesStore.search(searchTeam, within: clothesStore.closet)
+    }
+
     private var closetDisplay: some View {
         ScrollView(.horizontal){
             LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
-                ForEach(clothesStore.closetClothes) {
+                ForEach(searchedCloset) {
                     garment in
-                    closetDisplayItems(garmentNickname: garment.nickname ?? "NAME DOES NOT EXIST", garmentID : garment.id, selectedGarments: $selectedGarments, isSelecting: $isSelecting)
+                    closetDisplayItems(
+                        garment: garment,
+                        selectedGarments: $selectedGarments,
+                        isSelecting: $isSelecting
+                    )
                 }
             }
         }
     }
-    
+
     private var closetList : some View {
-        List(clothesStore.closetClothes, selection: $selectedGarments){
+        List(searchedCloset, selection: $selectedGarments){
             garment in
             HStack{
-                Image(systemName: "tshirt")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                GarmentIconView(item: garment)
                     .frame(width: 56, height: 56)
                     .background(.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -114,9 +123,8 @@ struct AddFromClosetView: View {
     }
     
     struct closetDisplayItems: View {
-        let garmentNickname : String
-        let garmentID : UUID
-        @Binding var selectedGarments : Set<UUID>
+        let garment: ClothingItem
+        @Binding var selectedGarments: Set<UUID>
         @Binding var isSelecting: Bool
         @State var isSelected: Bool = false
         var body : some View {
@@ -130,21 +138,30 @@ struct AddFromClosetView: View {
                                 .strokeBorder(Color.accentColor, lineWidth: 2)
                                 .opacity(isSelected ? 1 : 0)
                         )
-                    RoundedRectangle(cornerSize: CGSize(width: 8, height: 8))
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(Color.accentColor)
-                        .frame(width: 150, height: 220, alignment: .topTrailing)
-                    if (isSelecting){
+
+                    GarmentIconView(item: garment)
+                        .frame(width: 120, height: 120)
+                    if let referenceImageName = garment.referenceImageName {
+                        Image(referenceImageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 50, height: 50)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .frame(width: 150, height: 220, alignment: .topTrailing)
+                    }
+
+                    if (isSelecting) {
                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 24))
                             .foregroundStyle(Color.accentColor)
                             .frame(width: 150, height: 220, alignment: .bottomTrailing)
                     }
                 }
-                Text(garmentNickname)
+
+                Text(garment.nickname ?? "NAME DOES NOT EXIST")
             }.onTapGesture {
                 isSelected.toggle()
-                selectedGarments.insert(garmentID)
+                selectedGarments.insert(garment.id)
             }
         }
     }
@@ -152,8 +169,7 @@ struct AddFromClosetView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockCloset()
-    return NavigationStack {
+    NavigationStack {
         AddFromClosetView(clothesStore: store)
     }
 }

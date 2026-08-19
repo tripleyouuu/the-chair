@@ -5,31 +5,66 @@
 //  Created by Aurora Purnawan on 12/08/26.
 //
 
+
 import Foundation
 
 extension ClothesStore {
-    // Verdict said "needs wash" and the user agreed, queue it in the laundry bucket (only relocates it)
-    func moveToWashList(_ itemID: UUID) {
-        setLocation(.washList, for: itemID)
+    // Closet -> Pile
+    func addToPile(_ itemIDs: [UUID]) {
+        var movedItems: [ClothingItem] = []
+        closet.removeAll { item in
+            guard itemIDs.contains(item.id) else { return false }
+            var moved = item
+            moved.location = .pile
+            movedItems.append(moved)
+            return true
+        }
+        pile.append(contentsOf: movedItems)
+        savePersistence()
+        validateNoDuplicatesOrLoss()
     }
 
-    // Verdict said it's still wearable, back into active rotation
-    func moveToPile(_ itemID: UUID) {
-        setLocation(.pile, for: itemID)
+    // Pile -> Laundry Bag
+    func sendToLaundry(_ itemIDs: [UUID]) {
+        var movedItems: [ClothingItem] = []
+        pile.removeAll { item in
+            guard itemIDs.contains(item.id) else { return false }
+            var moved = item
+            moved.location = .washList
+            movedItems.append(moved)
+            return true
+        }
+        washList.append(contentsOf: movedItems)
+        savePersistence()
+        validateNoDuplicatesOrLoss()
     }
 
-    // User did the laundry, reset the wear count and send it back to the wardrobe
-    func markWashed(_ itemID: UUID) {
-        guard let index = clothes.firstIndex(where: { $0.id == itemID }) else { return }
-        clothes[index].wearSessions.removeAll()
-        clothes[index].location = .wardrobe
-        persistence.save(clothes)
+    // Laundry Bag -> Closet 
+    func finishWashing(_ itemIDs: [UUID]) {
+        var movedItems: [ClothingItem] = []
+        washList.removeAll { item in
+            guard itemIDs.contains(item.id) else { return false }
+            var washed = item
+            washed.wearSessions.removeAll()
+            washed.location = .wardrobe
+            movedItems.append(washed)
+            return true
+        }
+        closet.append(contentsOf: movedItems)
+        savePersistence()
+        validateNoDuplicatesOrLoss()
     }
 
-    // Only moveToWashList/moveToPile above (same file) can call this
-    private func setLocation(_ location: ClothingLocation, for itemID: UUID) {
-        guard let index = clothes.firstIndex(where: { $0.id == itemID }) else { return }
-        clothes[index].location = location
-        persistence.save(clothes)
+    // Debug-only safety net — crashes loudly during development if an item ever ends up
+    // in two arrays at once. Compiled out entirely in release builds, zero shipped cost.
+    private func validateNoDuplicatesOrLoss() {
+        #if DEBUG
+        let allIDs = pile.map(\.id) + closet.map(\.id) + washList.map(\.id)
+        let uniqueIDs = Set(allIDs)
+        assert(
+            allIDs.count == uniqueIDs.count,
+            "An item exists in more than one of pile/closet/washList — check the last move operation."
+        )
+        #endif
     }
 }
