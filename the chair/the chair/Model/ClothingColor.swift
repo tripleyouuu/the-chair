@@ -27,6 +27,29 @@ enum ClothingColor: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    // NOTE: eyeballed, not sampled from an exact design token — double check against
+    // FE's actual hex values before shipping, especially the light/dark variants.
+    var hexCode: String {
+        switch self {
+        case .white: return "#F2F1F6"
+        case .black: return "#1C1C1E"
+        case .gray: return "#A9ABB1"
+        case .beige: return "#D9C7A5"
+        case .red: return "#EF5350"
+        case .lightGreen: return "#7FC97F"
+        case .darkGreen: return "#1E6B33"
+        case .lightTeal: return "#5AB8B0"
+        case .darkTeal: return "#0D6660"
+        case .lightBlue: return "#5A99E5"
+        case .darkBlue: return "#14408C"
+        case .pink: return "#F0B8F7"
+        case .orange: return "#F2994A"
+        case .yellow: return "#F6C744"
+        case .purple: return "#5352ED"
+        case .brown: return "#9C7A5C"
+        }
+    }
+
     func multiplier(with clothingMaterial: ClothingMaterial) -> Double {
         guard self == .white,
               clothingMaterial != .denim,

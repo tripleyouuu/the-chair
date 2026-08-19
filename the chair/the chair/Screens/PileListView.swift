@@ -17,7 +17,7 @@ struct PileListView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(
-                    Array(clothesStore.clothes.enumerated().reversed()),
+                    Array(clothesStore.pile.enumerated().reversed()),
                     id: \.element.id
                 ) { index, item in
                     Button {
@@ -56,12 +56,11 @@ struct PileListView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockData()
 
-    return NavigationStack {
+    NavigationStack {
         PileListView(
             clothesStore: store,
-            currentIndex: .constant(store.clothes.count - 1)
+            currentIndex: .constant(store.pile.count - 1)
         )
     }
 }

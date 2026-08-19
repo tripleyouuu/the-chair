@@ -12,8 +12,7 @@ struct AddFromClosetView: View {
     @State var searchTeam : String = ""
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
-    @State private var isSelecting = true
-    @Environment(\.dismiss) private var dismiss
+    @State private var isSelecting = false
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -52,28 +51,50 @@ struct AddFromClosetView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .bottomBar) {
-                        Button {
-                            print(selectedGarments)
-                            dismiss()
-                        } label: {
-                            Text("Add to pile")
-                        }.buttonStyle(.borderedProminent)
-                    }
-                ToolbarItem(placement: .topBarTrailing) {
+                if (isSelecting) {
+                    ToolbarItem(placement: .bottomBar) {
+                            Button {
+                                clothesStore.addToPile(Array(selectedGarments))
+                                selectedGarments.removeAll()
+                                isSelecting = false
+                            } label: {
+                                Text("Add to pile")
+                            }.buttonStyle(.borderedProminent)
+                        }
+                    ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                isSelecting.toggle()
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                } else {
+                    ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                isSelecting.toggle()
+                            } label: {
+                                Text("Select")
+                            }
+                        }
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             isListView.toggle()
                         } label: {
                             Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                         }
                     }
+                }
             }
     }
     
+    private var searchedCloset: [ClothingItem] {
+        clothesStore.search(searchTeam, within: clothesStore.closet)
+    }
+
     private var closetDisplay: some View {
         ScrollView(.horizontal){
             LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
-                ForEach(clothesStore.clothes) {
+                ForEach(searchedCloset) {
                     garment in
                     closetDisplayItems(
                         garment: garment,
@@ -84,9 +105,9 @@ struct AddFromClosetView: View {
             }
         }
     }
-    
+
     private var closetList : some View {
-        List(clothesStore.clothes, selection: $selectedGarments){
+        List(searchedCloset, selection: $selectedGarments){
             garment in
             HStack{
                 GarmentIconView(item: garment)
@@ -145,8 +166,7 @@ struct AddFromClosetView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockCloset()
-    return NavigationStack {
+    NavigationStack {
         AddFromClosetView(clothesStore: store)
     }
 }
