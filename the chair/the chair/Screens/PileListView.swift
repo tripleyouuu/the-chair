@@ -1,7 +1,6 @@
 //
 //  PileListView.swift
 //
-//
 //  Created by Vitha Watson on 13/08/26.
 //
 
@@ -10,7 +9,6 @@ import SwiftUI
 struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
     @Binding var currentIndex: Int
-
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -21,8 +19,8 @@ struct PileListView: View {
                     id: \.element.id
                 ) { index, item in
                     Button {
-                        currentIndex = index //picking an item from the list just goes to the og evalview instead of creating one for the chosen item and then returning
-                        dismiss() //tells the listview to fuck itself instead of lodging in the navigation flow
+                        currentIndex = index
+                        dismiss()
                     } label: {
                         HStack {
                             GarmentIconView(item: item)
