@@ -25,9 +25,7 @@ struct PileListView: View {
                         dismiss() //tells the listview to fuck itself instead of lodging in the navigation flow
                     } label: {
                         HStack {
-                            Image(systemName: "tshirt")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
+                            GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
                                 .background(.gray.opacity(0.1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
