@@ -7,21 +7,28 @@
 
 import Foundation
 
-// Everything about *where* clothes data is saved lives here — ClothesStore
-// shouldn't know or care that it's UserDefaults today.
+// Everything about *where* clothes data is saved lives here 
 struct ClothesPersistence {
     private let storageKey = "clothes"
 
-    func load() -> [ClothingItem]? {
-        guard let data = UserDefaults.standard.data(forKey: storageKey),
-              let decoded = try? JSONDecoder().decode([ClothingItem].self, from: data) else {
-            return nil
-        }
-        return decoded
+
+    private struct PersistedClothes: Codable {
+        var pile: [ClothingItem]
+        var closet: [ClothingItem]
+        var washList: [ClothingItem]
     }
 
-    func save(_ clothes: [ClothingItem]) {
-        guard let data = try? JSONEncoder().encode(clothes) else { return }
+    func load() -> (pile: [ClothingItem], closet: [ClothingItem], washList: [ClothingItem])? {
+        guard let data = UserDefaults.standard.data(forKey: storageKey),
+              let decoded = try? JSONDecoder().decode(PersistedClothes.self, from: data) else {
+            return nil
+        }
+        return (decoded.pile, decoded.closet, decoded.washList)
+    }
+
+    func save(pile: [ClothingItem], closet: [ClothingItem], washList: [ClothingItem]) {
+        let bundle = PersistedClothes(pile: pile, closet: closet, washList: washList)
+        guard let data = try? JSONEncoder().encode(bundle) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)
     }
 }

@@ -111,7 +111,6 @@ struct HomeView: View {
 
 #Preview {
     let store = ClothesStore()
-    store.seedMockData()
-    store.seedMockCloset()
-    return HomeView(clothesStore: store)
+
+    HomeView(clothesStore: store)
 }

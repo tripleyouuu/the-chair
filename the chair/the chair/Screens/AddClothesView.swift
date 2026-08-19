@@ -159,9 +159,6 @@ struct AddClothesView: View {
 }
 
 #Preview {
-    let store = ClothesStore()
-    store.seedMockData()
-    return NavigationStack {
-        AddClothesView()
-    }
+    AddClothesView()
 }
+
