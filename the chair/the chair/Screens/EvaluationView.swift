@@ -220,9 +220,24 @@ struct EvaluationView: View {
         ScrollView {
             VStack(spacing: 24) {
                 garmentPreview(for: item)
-                durationSection
-                environmentSection
-                activitySection
+                
+                // fuckass returns
+
+                if item.clothingMaterial == .silk {
+                    silkInfoSection
+                } else if item.clothingMaterial == .dryFit {
+                    dryFitInfoSection
+                } else if item.clothingColor == .white &&
+                            item.clothingMaterial != .denim &&
+                            item.clothingMaterial != .wool &&
+                            item.clothingMaterial != .silk {
+                    whiteInfoSection
+                } else {
+                    durationSection
+                    environmentSection
+                    activitySection
+                }
+
                 verdictSection
             }
             .padding(.horizontal, 24)
@@ -264,6 +279,34 @@ struct EvaluationView: View {
             Text(item.nickname ?? "Nickname") // TODO: add auto nickname logic
                 .font(.headline)
         }
+    }
+    
+    // fuckass returns returns
+    
+    private var silkInfoSection: some View {
+        Text("This garment is made of silk! In order to preserve the durability of this fabric, it is not recommended to wash it unless absolutely necessary (heavy sweat, staining, etc.)")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 216)
+    }
+    private var dryFitInfoSection: some View {
+        Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 216)
+    }
+
+    private var whiteInfoSection: some View {
+        Text("This garment is white in color. In order to preserve the brightness of the white fabric, it is recommended to wash it even after light use.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .frame(height: 216)
     }
 
     private var durationSection: some View {
