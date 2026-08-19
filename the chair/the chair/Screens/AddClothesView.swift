@@ -12,9 +12,11 @@ struct AddClothesView: View {
     @State private var clothesMaterial: ClothingMaterial = .dryFit
     @State private var clothesCategory: ClothingCategory = .top
     @State private var clothesSilhouettes: ClothingSilhouette = .tShirt
+    @State private var clothesColor: ClothingColor = .red
     @Environment(\.dismiss) private var dismiss
     // TODO: set proper default values
     
+    @State private var toast: Toast?
     
     
     let columns = [
@@ -26,28 +28,46 @@ struct AddClothesView: View {
     }
     
     var body: some View {
-            VStack(spacing:20){
+            ScrollView {
+                VStack(spacing:20){
                     clothesPreview
                     TextField("Nickname", text: $clothesNickname)
                         .textFieldStyle(.plain)
                         .padding()
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(.infinity)
+                    colorSection
                     materialSection
                     categorySection
                     silhouetteSection
+                    
+                }
+                .padding(.top, 100)
+                .padding(20)
             }
-            .padding(20)
+            // TO USE TOAST, ADD THIS
+            .toast($toast)
+            .ignoresSafeArea(edges: .all)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        dismiss()
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)){
+                            // AND THIS TO CALL THE TOAST
+                            toast = Toast(message: clothesNickname + " saved successfully")
+                        }
                     } label: {
                         Image(systemName: "checkmark")
                     }.buttonStyle(.borderedProminent)
                 }
             }
-    }
+        }
     
     private var clothesPreview : some View {
         ZStack{
@@ -60,6 +80,38 @@ struct AddClothesView: View {
                         .font(.system(size: 70))
                         .foregroundStyle(.secondary)
                 }
+        }
+    }
+    
+    struct ColorPicker: View {
+        var color : ClothingColor = .red
+        @Binding var selectedColor: ClothingColor
+        var body : some View {
+            Button {
+                selectedColor = color
+            } label: {
+                ZStack{
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: 32)
+                    Circle().stroke(.white, lineWidth: color == .white ? 2 : 0)
+                    Circle().stroke(Color(.systemGray2), lineWidth: color == selectedColor ? 4 : 0)
+                        .frame(width: 40)
+                }
+            }
+        }
+    }
+    
+    private var colorSection : some View {
+        VStack(alignment: .leading){
+            Text("COLOR")
+                .font(.headline)
+            LazyVGrid(columns:[GridItem(.adaptive(minimum: 38))], alignment: .center){
+                ForEach(ClothingColor.allCases) {
+                    color in
+                    ColorPicker(color: color, selectedColor: $clothesColor)
+                }
+            }
         }
     }
     
@@ -136,7 +188,7 @@ struct AddClothesView: View {
                     }){
                         ZStack{
                             Rectangle()
-                                .frame(height:120)
+                                .frame(width: .infinity, height:120)
                                 .foregroundStyle(clothesSilhouettes == silhouettes ? Color.accentColor : Color(.systemGray5))
                                 .cornerRadius(16)
 //                                    Image(systemName: "tshirt.fill")
@@ -153,12 +205,14 @@ struct AddClothesView: View {
 
                     }
                 }
-            }
+            }.frame(width: .infinity)
         }
     }
 }
 
 #Preview {
-    AddClothesView()
+    let store = ClothesStore()
+    NavigationStack {
+        AddClothesView()
+    }
 }
-
