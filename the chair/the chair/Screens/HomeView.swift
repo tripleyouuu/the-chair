@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
     @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
+    @State private var toast: Toast?
     
     var body: some View {
         NavigationStack {
@@ -31,7 +32,10 @@ struct HomeView: View {
 
                 VStack(spacing: 16) {
                     NavigationLink {
-                        EvaluationView(clothesStore: clothesStore)
+                        EvaluationView(
+                            clothesStore: clothesStore,
+                            toast: $toast
+                        )
                     } label: {
                         Text("Evaluate")
                             .font(.headline)
@@ -109,6 +113,7 @@ struct HomeView: View {
                 .padding(.vertical, 8)
             }
         }
+        .toast($toast)
     }
 }
 

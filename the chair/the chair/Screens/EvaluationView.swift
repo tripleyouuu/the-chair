@@ -9,9 +9,8 @@ import SwiftUI
 
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
-
     @Environment(\.dismiss) private var dismiss
-
+    @Binding var toast: Toast?
     @State private var currentIndex: Int
     @State private var hoursWorn = 8
     @State private var hoursWornText = "8"
@@ -28,10 +27,11 @@ struct EvaluationView: View {
     
     init(
         clothesStore: ClothesStore,
-        initialIndex: Int? = nil
+        initialIndex: Int? = nil,
+        toast: Binding<Toast?>
     ) {
         self.clothesStore = clothesStore
-
+        self._toast = toast
         let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
     }
@@ -82,9 +82,14 @@ struct EvaluationView: View {
         )
     }
     
-    private func finishSession() {
+    private func finishSession(showToast: Bool = false) {
         sessionStarted = false
         sessionVisitedIDs.removeAll()
+
+        if showToast {
+            toast = Toast(message: "Sorted all items in pile!")
+        }
+
         dismiss()
     }
     
@@ -94,7 +99,7 @@ struct EvaluationView: View {
         }
 
         guard let nextIndex else {
-            finishSession()
+            finishSession(showToast: true)
             return
         }
 
@@ -623,6 +628,9 @@ struct EvaluationView: View {
     let store = ClothesStore()
 
     NavigationStack {
-        EvaluationView(clothesStore: store)
+        EvaluationView(
+            clothesStore: store,
+            toast: .constant(nil)
+        )
     }
 }
