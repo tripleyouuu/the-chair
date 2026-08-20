@@ -210,7 +210,8 @@ struct EvaluationView: View {
                     PileListView(
                         clothesStore: clothesStore,
                         currentIndex: $currentIndex,
-                        selectionVersion: $selectionVersion
+                        selectionVersion: $selectionVersion,
+                        toast: $toast
                     )
                 } label: {
                     Image(systemName: "list.dash")

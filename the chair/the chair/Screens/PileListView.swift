@@ -10,7 +10,8 @@ struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
     @Binding var currentIndex: Int
     @Binding var selectionVersion: Int
-    @Environment(\.dismiss) private var dismiss
+    @Binding var toast: Toast?
+//    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
@@ -19,10 +20,12 @@ struct PileListView: View {
                     Array(clothesStore.pile.enumerated().reversed()),
                     id: \.element.id
                 ) { index, item in
-                    Button {
-                        currentIndex = index
-                        selectionVersion += 1
-                        dismiss()
+                    NavigationLink {
+                        EvaluationView(
+                            clothesStore: clothesStore,
+                            initialIndex: index,
+                            toast: $toast
+                        )
                     } label: {
                         HStack {
                             GarmentIconView(item: item)
@@ -66,7 +69,8 @@ struct PileListView: View {
         PileListView(
             clothesStore: store,
             currentIndex: .constant(store.pile.count - 1),
-            selectionVersion: .constant(0)
+            selectionVersion: .constant(0),
+            toast: .constant(nil)
         )
     }
 }

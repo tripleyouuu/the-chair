@@ -23,10 +23,21 @@ struct HomeView: View {
 
                 Spacer()
 
-                Image(systemName: "chair")
-                    .font(.system(size: 240))
-                    .foregroundStyle(.secondary)
-                    .frame(maxHeight: 280)
+                NavigationLink {
+                    PileListView(
+                        clothesStore: clothesStore,
+                        currentIndex: .constant(0),
+                        selectionVersion: .constant(0),
+                        toast: $toast
+                    )
+                } label: {
+                    Image("Empty Chair")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.secondary)
+                        .frame(maxHeight: 280)
+                }
+                .buttonStyle(.plain)
 
                 Spacer()
 
