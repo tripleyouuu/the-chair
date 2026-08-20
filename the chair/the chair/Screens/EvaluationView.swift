@@ -294,7 +294,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
     private var dryFitInfoSection: some View {
         Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
@@ -302,7 +302,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
 
     private var whiteInfoSection: some View {
@@ -311,7 +311,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
 
     private var durationSection: some View {
@@ -392,12 +392,6 @@ struct EvaluationView: View {
                 Text(environmentName)
                     .foregroundStyle(.secondary)
 
-                Button {
-                } label: {
-                    Image(systemName: "questionmark")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.circle) // env info
                 
@@ -435,6 +429,9 @@ struct EvaluationView: View {
                 Image(systemName: "sun.max")
                     .foregroundStyle(.secondary)
             }
+            Text(environmentDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -446,21 +443,11 @@ struct EvaluationView: View {
 
                 Text(activityName)
                     .foregroundStyle(.secondary)
-
-                Button {
-                } label: {
-                    Image(systemName: "questionmark")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle) // act info
             }
 
             HStack(spacing: 16) {
                 Image(systemName: "figure.seated.side")
                     .foregroundStyle(.secondary)
-
                 Slider(
                     value: Binding(
                         get: { Double(activityIndex) },
@@ -488,6 +475,9 @@ struct EvaluationView: View {
                 Image(systemName: "figure.run")
                     .foregroundStyle(.secondary)
             }
+            Text(activityDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -541,6 +531,36 @@ struct EvaluationView: View {
             return "Active"
         case .intense:
             return "Intense"
+        }
+    }
+    
+    private var environmentDescription: String {
+        switch currentEnvironment {
+        case .cold:
+            return "Air conditioned or winter; almost no sweat."
+        case .cool:
+            return "Generally chilly conditions; very little sweat."
+        case .mild:
+            return "Neither chilly nor stuffy, moderate sweat."
+        case .warm:
+            return "Generally stuffy conditions; quite sweaty."
+        case .hot:
+            return "Suffocating or summer; very sweaty."
+        }
+    }
+
+    private var activityDescription: String {
+        switch currentActivity {
+        case .resting:
+            return "Sedentary with little to no movement."
+        case .light:
+            return "Some movement such as a short walk."
+        case .moderate:
+            return "Average movement - brisk walks / brief exercise."
+        case .active:
+            return "Constant movement - long walks / moderate exercise."
+        case .intense:
+            return "High-energy movement - dancing / gymming."
         }
     }
     
