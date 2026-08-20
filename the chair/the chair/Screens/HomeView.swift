@@ -53,9 +53,12 @@ struct HomeView: View {
 
                 Spacer()
             }
-            .navigationTitle("The Chair")
-            .toolbarTitleDisplayMode(.inlineLarge)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("THE CHAIR")
+                    .font(Font.custom("SueEllenFrancisco", size: 48))
+                    .padding(.top, 160)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                     } label: {

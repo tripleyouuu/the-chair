@@ -49,8 +49,13 @@ struct PileListView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Pile")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("PILE")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+            }
+        }
     }
 }
 

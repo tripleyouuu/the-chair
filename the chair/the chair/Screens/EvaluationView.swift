@@ -191,6 +191,11 @@ struct EvaluationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("EVALUATE")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+            }
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     finishSession()
