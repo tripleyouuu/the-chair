@@ -13,6 +13,7 @@ struct AddFromClosetView: View {
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
     @State private var isSelecting = true
+    @Environment(\.dismiss) private var dismiss
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -56,6 +57,7 @@ struct AddFromClosetView: View {
                             clothesStore.addToPile(Array(selectedGarments))
                             selectedGarments.removeAll()
                             isSelecting = false
+                            dismiss()
                         } label: {
                             Text("Add to pile")
                         }.buttonStyle(.borderedProminent)

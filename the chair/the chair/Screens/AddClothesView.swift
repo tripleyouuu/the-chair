@@ -8,23 +8,31 @@
 import SwiftUI
 
 struct AddClothesView: View {
-    @State private var clothesNickname: String = ""
-    @State private var clothesMaterial: ClothingMaterial = .dryFit
-    @State private var clothesCategory: ClothingCategory = .top
-    @State private var clothesSilhouettes: ClothingSilhouette = .tShirt
-    @State private var clothesColor: ClothingColor = .red
+    @ObservedObject var clothesStore: ClothesStore
+    @State private var clothingNickname: String = ""
+    @State private var clothingMaterial: ClothingMaterial = .dryFit
+    @State private var clothingCategory: ClothingCategory = .top
+    @State private var clothingSilhouette: ClothingSilhouette = .tShirt
+    @State private var clothingColor: ClothingColor = .white
+    
     @Environment(\.dismiss) private var dismiss
     // TODO: set proper default values
     
-    @State private var toast: Toast?
+    init(
+        clothesStore: ClothesStore,
+    ) {
+        self.clothesStore = clothesStore
+    }
+
     
+    @State private var toast: Toast?
     
     let columns = [
             GridItem(.adaptive(minimum: 100))
     ]
     
     var silhouettesOptions : [ClothingSilhouette] {
-        ClothingSilhouette.allCases.filter{ $0.category == clothesCategory }
+        ClothingSilhouette.allCases.filter{ $0.category == clothingCategory }
     }
     
     var body: some View {
@@ -46,10 +54,21 @@ struct AddClothesView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        let newClothingNickname : String = clothingNickname == "" ? clothingColor.rawValue + " " + clothingSilhouette.rawValue : clothingNickname
+                        let newClothing : ClothingItem =
+                        ClothingItem(
+                            nickname: newClothingNickname,
+                            clothingMaterial: clothingMaterial,
+                            clothingColor: clothingColor,
+                            silhouette: clothingSilhouette,
+                            location: .pile
+                        )
+                        clothesStore.addItem(newClothing)
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.75)){
                             // AND THIS TO CALL THE TOAST
-                            toast = Toast(message: clothesNickname + " saved successfully")
+                            toast = Toast(message: newClothingNickname + " saved successfully")
                         }
+                        resetForm()
                     } label: {
                         Image(systemName: "checkmark")
                     }.buttonStyle(.borderedProminent)
@@ -60,7 +79,6 @@ struct AddClothesView: View {
     private var clothesPreviewNickname : some View {
         VStack(spacing:16){
             ZStack{
-                // TODO: add button to set colors
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color(.systemGray6))
                     .frame(width: 200, height: 200)
@@ -70,7 +88,7 @@ struct AddClothesView: View {
                             .foregroundStyle(.secondary)
                     }
             }
-            TextField("Nickname", text: $clothesNickname)
+            TextField("Nickname", text: $clothingNickname)
                 .textFieldStyle(.plain)
                 .padding()
                 .background(Color(.systemGray6))
@@ -108,12 +126,12 @@ struct AddClothesView: View {
             VStack(alignment: .leading){
                 Text("Color")
                     .font(.headline)
-                Text(clothesColor.rawValue)
+                Text(clothingColor.rawValue)
             }
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 34))], alignment: .center){
                 ForEach(ClothingColor.allCases) {
                     color in
-                    ColorPicker(color: color, selectedColor: $clothesColor)
+                    ColorPicker(color: color, selectedColor: $clothingColor)
                 }
             }
             .padding()
@@ -132,18 +150,18 @@ struct AddClothesView: View {
                 ForEach(ClothingMaterial.allCases) {
                     material in
                     Button(action: {
-                        self.clothesMaterial = material
+                        self.clothingMaterial = material
                     }){
                         Text(material.rawValue)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
                             .background(
-                                clothesMaterial == material
+                                clothingMaterial == material
                                     ? Color.accentColor
                                 : Color(.systemGray5)
                             )
                             .foregroundStyle(
-                                clothesMaterial == material
+                                clothingMaterial == material
                                 ? .white
                                 : Color(.systemGray)
                             )
@@ -166,18 +184,18 @@ struct AddClothesView: View {
                     ForEach(ClothingCategory.allCases) {
                         category in
                         Button(action: {
-                            self.clothesCategory = category
+                            self.clothingCategory = category
                         }){
                             Text(category.rawValue)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
                                 .background(
-                                    clothesCategory == category
+                                    clothingCategory == category
                                     ? Color.accentColor
                                     : Color(.systemGray5)
                                 )
                                 .foregroundStyle(
-                                    clothesCategory == category
+                                    clothingCategory == category
                                     ? .white
                                     : Color(.systemGray)
                                 )
@@ -197,19 +215,19 @@ struct AddClothesView: View {
         VStack(alignment: .leading, spacing: 8){
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 100))], alignment: .center){
                 ForEach(silhouettesOptions){
-                    silhouettes in
+                    silhouette in
                     Button(action: {
-                        self.clothesSilhouettes = silhouettes
+                        self.clothingSilhouette = silhouette
                         //change it later
                     }){
                         ZStack{
                             Rectangle()
                                 .frame(width: .infinity, height:120)
-                                .foregroundStyle(clothesSilhouettes == silhouettes ? Color.accentColor : Color(.systemGray5))
+                                .foregroundStyle(clothingSilhouette == silhouette ? Color.accentColor : Color(.systemGray5))
                                 .cornerRadius(16)
-                            Text(silhouettes.rawValue)
+                            Text(silhouette.rawValue)
                             .foregroundStyle(
-                                clothesSilhouettes == silhouettes
+                                clothingSilhouette == silhouette
                                 ? .white
                                 : Color(.systemGray)
                             )
@@ -217,14 +235,22 @@ struct AddClothesView: View {
 
                     }
                 }
-            }.frame(width: .infinity)
+            }
         }
+    }
+    
+    func resetForm() {
+        clothingNickname = ""
+        clothingMaterial = .dryFit
+        clothingCategory = .top
+        clothingSilhouette = .tShirt
+        clothingColor = .white
     }
 }
 
 #Preview {
     let store = ClothesStore()
     NavigationStack {
-        AddClothesView()
+        AddClothesView(clothesStore: store)
     }
 }
