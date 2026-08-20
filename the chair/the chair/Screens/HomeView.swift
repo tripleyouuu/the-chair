@@ -90,6 +90,7 @@ struct HomeView: View {
                             } label : {
                                 Text("Add from closet")
                             }
+                            .disabled(clothesStore.closet.isEmpty)
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title)

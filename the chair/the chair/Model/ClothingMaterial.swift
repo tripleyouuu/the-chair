@@ -19,7 +19,8 @@ enum ClothingMaterial: String, CaseIterable, Codable, Identifiable {
 
     var baseHours: Double {
         switch self {
-        case .dryFit, .silk: return 0
+        case .dryFit: return 0
+        case .silk: return 9999
         case .natural: return 16
         case .synthetic: return 12
         case .denim: return 48
