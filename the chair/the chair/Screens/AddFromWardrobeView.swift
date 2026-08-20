@@ -52,6 +52,11 @@ struct AddFromClosetView: View {
                 }
             }
             .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("CLOSET")
+                            .font(Font.custom("SueEllenFrancisco", size: 32))
+                            .padding(.top,8)
+                    }
                     ToolbarItem(placement: .bottomBar) {
                         Button {
                             clothesStore.addToPile(Array(selectedGarments))

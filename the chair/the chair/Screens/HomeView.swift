@@ -23,10 +23,21 @@ struct HomeView: View {
 
                 Spacer()
 
-                Image(systemName: "chair")
-                    .font(.system(size: 240))
-                    .foregroundStyle(.secondary)
-                    .frame(maxHeight: 280)
+                NavigationLink {
+                    PileListView(
+                        clothesStore: clothesStore,
+                        currentIndex: .constant(0),
+                        selectionVersion: .constant(0),
+                        toast: $toast
+                    )
+                } label: {
+                    Image("Empty Chair")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.secondary)
+                        .frame(maxHeight: 280)
+                }
+                .buttonStyle(.plain)
 
                 Spacer()
 
@@ -53,9 +64,12 @@ struct HomeView: View {
 
                 Spacer()
             }
-            .navigationTitle("The Chair")
-            .toolbarTitleDisplayMode(.inlineLarge)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("THE CHAIR")
+                    .font(Font.custom("SueEllenFrancisco", size: 48))
+                    .padding(.top, 160)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                     } label: {

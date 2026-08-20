@@ -191,6 +191,11 @@ struct EvaluationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("EVALUATE")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+            }
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     finishSession()
@@ -205,7 +210,8 @@ struct EvaluationView: View {
                     PileListView(
                         clothesStore: clothesStore,
                         currentIndex: $currentIndex,
-                        selectionVersion: $selectionVersion
+                        selectionVersion: $selectionVersion,
+                        toast: $toast
                     )
                 } label: {
                     Image(systemName: "list.dash")
