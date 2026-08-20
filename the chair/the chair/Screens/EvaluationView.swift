@@ -9,9 +9,8 @@ import SwiftUI
 
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
-
     @Environment(\.dismiss) private var dismiss
-
+    @Binding var toast: Toast?
     @State private var currentIndex: Int
     @State private var hoursWorn = 8
     @State private var hoursWornText = "8"
@@ -22,12 +21,17 @@ struct EvaluationView: View {
     @State private var sessionStarted = false
     @State private var currentItemIsRevisit = false
     @State private var selectionVersion = 0
+    @State private var inputWasChanged = false
+    @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
+    @AppStorage("clothesSavedFromOverWashingIDs") private var clothesSavedFromOverWashingIDs = ""
+    
     init(
         clothesStore: ClothesStore,
-        initialIndex: Int? = nil
+        initialIndex: Int? = nil,
+        toast: Binding<Toast?>
     ) {
         self.clothesStore = clothesStore
-
+        self._toast = toast
         let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
     }
@@ -58,6 +62,7 @@ struct EvaluationView: View {
         }
 
         durationFieldFocused = false
+        inputWasChanged = false
     }
     
     private func startSession() {
@@ -77,9 +82,14 @@ struct EvaluationView: View {
         )
     }
     
-    private func finishSession() {
+    private func finishSession(showToast: Bool = false) {
         sessionStarted = false
         sessionVisitedIDs.removeAll()
+
+        if showToast {
+            toast = Toast(message: "Sorted all items in pile!")
+        }
+
         dismiss()
     }
     
@@ -89,7 +99,7 @@ struct EvaluationView: View {
         }
 
         guard let nextIndex else {
-            finishSession()
+            finishSession(showToast: true)
             return
         }
 
@@ -289,7 +299,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
     private var dryFitInfoSection: some View {
         Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
@@ -297,7 +307,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
 
     private var whiteInfoSection: some View {
@@ -306,7 +316,7 @@ struct EvaluationView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 216)
+            .frame(height: 264)
     }
 
     private var durationSection: some View {
@@ -319,6 +329,7 @@ struct EvaluationView: View {
 
                 HStack(spacing: 8) {
                     Button {
+                        inputWasChanged = true
                         hoursWorn = max(1, hoursWorn - 1)
                         hoursWornText = String(hoursWorn)
                         durationFieldFocused = false
@@ -350,10 +361,15 @@ struct EvaluationView: View {
                                 if evaluationIsLocked {
                                     hoursWornText = String(hoursWorn)
                                 }
+                                
+                                if durationFieldFocused {
+                                    inputWasChanged = true
+                                }
                             }
                         }
 
                     Button {
+                        inputWasChanged = true
                         hoursWorn = min(99, hoursWorn + 1)
                         hoursWornText = String(hoursWorn)
                         durationFieldFocused = false
@@ -381,12 +397,6 @@ struct EvaluationView: View {
                 Text(environmentName)
                     .foregroundStyle(.secondary)
 
-                Button {
-                } label: {
-                    Image(systemName: "questionmark")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.circle) // env info
                 
@@ -400,14 +410,21 @@ struct EvaluationView: View {
                     value: Binding(
                         get: { Double(environmentIndex) },
                         set: {
+                            let newValue: Int
                             if evaluationIsLocked {
-                                environmentIndex = max(
+                                newValue = max(
                                     currentItem?.savedEvaluation?.environmentIndex ?? 0,
                                     Int($0.rounded())
                                 )
                             } else {
-                                environmentIndex = Int($0.rounded())
+                                newValue = Int($0.rounded())
                             }
+
+                            if newValue != environmentIndex {
+                                inputWasChanged = true
+                            }
+
+                            environmentIndex = newValue
                         }
                     ),
                     in: 0...4,
@@ -417,6 +434,9 @@ struct EvaluationView: View {
                 Image(systemName: "sun.max")
                     .foregroundStyle(.secondary)
             }
+            Text(environmentDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -428,33 +448,30 @@ struct EvaluationView: View {
 
                 Text(activityName)
                     .foregroundStyle(.secondary)
-
-                Button {
-                } label: {
-                    Image(systemName: "questionmark")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle) // act info
             }
 
             HStack(spacing: 16) {
                 Image(systemName: "figure.seated.side")
                     .foregroundStyle(.secondary)
-
                 Slider(
                     value: Binding(
                         get: { Double(activityIndex) },
                         set: {
+                            let newValue: Int
                             if evaluationIsLocked {
-                                activityIndex = max(
+                                newValue = max(
                                     currentItem?.savedEvaluation?.activityIndex ?? 0,
                                     Int($0.rounded())
                                 )
                             } else {
-                                activityIndex = Int($0.rounded())
+                                newValue = Int($0.rounded())
                             }
+
+                            if newValue != activityIndex {
+                                inputWasChanged = true
+                            }
+
+                            activityIndex = newValue
                         }
                     ),
                     in: 0...4,
@@ -463,6 +480,9 @@ struct EvaluationView: View {
                 Image(systemName: "figure.run")
                     .foregroundStyle(.secondary)
             }
+            Text(activityDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -518,6 +538,56 @@ struct EvaluationView: View {
             return "Intense"
         }
     }
+    
+    private var environmentDescription: String {
+        switch currentEnvironment {
+        case .cold:
+            return "Air conditioned or winter; almost no sweat."
+        case .cool:
+            return "Generally chilly conditions; very little sweat."
+        case .mild:
+            return "Neither chilly nor stuffy, moderate sweat."
+        case .warm:
+            return "Generally stuffy conditions; quite sweaty."
+        case .hot:
+            return "Suffocating or summer; very sweaty."
+        }
+    }
+
+    private var activityDescription: String {
+        switch currentActivity {
+        case .resting:
+            return "Sedentary with little to no movement."
+        case .light:
+            return "Some movement such as a short walk."
+        case .moderate:
+            return "Average movement - brisk walks / brief exercise."
+        case .active:
+            return "Constant movement - long walks / moderate exercise."
+        case .intense:
+            return "High-energy movement - dancing / gymming."
+        }
+    }
+    
+    // making sure the clothes-saved counter doesn't increment unless modified before keeping
+    
+    private func registerSavedGarment(_ id: UUID) {
+        guard inputWasChanged else { return }
+
+        var savedIDs = Set(
+            clothesSavedFromOverWashingIDs
+                .split(separator: ",")
+                .compactMap { UUID(uuidString: String($0)) }
+        )
+
+        guard savedIDs.insert(id).inserted else { return }
+
+        clothesSavedFromOverWashingIDs = savedIDs
+            .map(\.uuidString)
+            .joined(separator: ",")
+
+        clothesSavedFromOverWashing = savedIDs.count
+    }
 
     private func registerDecision(washing: Bool) {
         guard currentIndex < clothesStore.pile.count else { return }
@@ -532,8 +602,8 @@ struct EvaluationView: View {
                 environmentIndex: environmentIndex,
                 activityIndex: activityIndex
             )
-
             clothesStore.savePersistence()
+            registerSavedGarment(currentItem.id)
         }
 
         advanceToNextItem()
@@ -558,6 +628,9 @@ struct EvaluationView: View {
     let store = ClothesStore()
 
     NavigationStack {
-        EvaluationView(clothesStore: store)
+        EvaluationView(
+            clothesStore: store,
+            toast: .constant(nil)
+        )
     }
 }

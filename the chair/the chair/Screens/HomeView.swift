@@ -9,13 +9,15 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
+    @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
+    @State private var toast: Toast?
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 Spacer()
 
-                Text("Clothes saved from over-washing: 67") // hehe kill me
+                Text("Clothes saved from over-washing: \(clothesSavedFromOverWashing)") // when i use this app and it hits 67 i will stop using the app
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
@@ -30,7 +32,10 @@ struct HomeView: View {
 
                 VStack(spacing: 16) {
                     NavigationLink {
-                        EvaluationView(clothesStore: clothesStore)
+                        EvaluationView(
+                            clothesStore: clothesStore,
+                            toast: $toast
+                        )
                     } label: {
                         Text("Evaluate")
                             .font(.headline)
@@ -108,6 +113,7 @@ struct HomeView: View {
                 .padding(.vertical, 8)
             }
         }
+        .toast($toast)
     }
 }
 
