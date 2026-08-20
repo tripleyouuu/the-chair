@@ -73,6 +73,10 @@ struct AddClothesView: View {
                         Image(systemName: "checkmark")
                     }.buttonStyle(.borderedProminent)
                 }
+                ToolbarItem(placement: .title){
+                    Text("ADD NEW")
+                        .font(Font.custom("SueEllenFrancisco", size: 32))
+                }
             }
         }
     
@@ -83,13 +87,12 @@ struct AddClothesView: View {
                     .fill(Color(.systemGray6))
                     .frame(width: 200, height: 200)
                     .overlay {
-                        Image(systemName: "tshirt")
-                            .font(.system(size: 70))
-                            .foregroundStyle(.secondary)
+                        GarmentPreviewView(clothingColor: $clothingColor, clothingSilhouette: $clothingSilhouette)
                     }
             }
-            TextField("Nickname", text: $clothingNickname)
+            TextField("Nickname (optional)", text: $clothingNickname)
                 .textFieldStyle(.plain)
+                .multilineTextAlignment(.center)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(.infinity)
@@ -108,7 +111,7 @@ struct AddClothesView: View {
             } label: {
                 ZStack{
                     Circle()
-                        .fill(Color(color.swiftUIColor))
+                        .fill(Color(color.rawValue))
                         .frame(width: 32)
                     Circle()
                         .stroke(Color(.systemGray4), lineWidth: color == .white ? 2 : 0)
@@ -123,10 +126,11 @@ struct AddClothesView: View {
     
     private var colorSection : some View {
         VStack(alignment: .leading){
-            VStack(alignment: .leading){
+            HStack(){
                 Text("Color")
                     .font(.headline)
                 Text(clothingColor.rawValue)
+                    .foregroundStyle(Color(.systemGray))
             }
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 34))], alignment: .center){
                 ForEach(ClothingColor.allCases) {
@@ -225,7 +229,7 @@ struct AddClothesView: View {
                                 .frame(width: .infinity, height:120)
                                 .foregroundStyle(clothingSilhouette == silhouette ? Color.accentColor : Color(.systemGray5))
                                 .cornerRadius(16)
-                            Text(silhouette.rawValue)
+                            Text(silhouette.name)
                             .foregroundStyle(
                                 clothingSilhouette == silhouette
                                 ? .white
