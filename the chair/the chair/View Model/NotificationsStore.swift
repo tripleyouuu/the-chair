@@ -91,7 +91,7 @@ final class NotificationsStore: ObservableObject {
 
     private func scheduleLaundryReminder() {
         var components = laundryReminderTime
-        components.weekday = laundryReminderDay.rawValuew
+        components.weekday = laundryReminderDay.rawValue
 
         let content = UNMutableNotificationContent()
         content.title = "Laundry Day Reminder"
