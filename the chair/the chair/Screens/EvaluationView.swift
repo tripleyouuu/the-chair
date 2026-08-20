@@ -22,6 +22,10 @@ struct EvaluationView: View {
     @State private var sessionStarted = false
     @State private var currentItemIsRevisit = false
     @State private var selectionVersion = 0
+    @State private var inputWasChanged = false
+    @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
+    @AppStorage("clothesSavedFromOverWashingIDs") private var clothesSavedFromOverWashingIDs = ""
+    
     init(
         clothesStore: ClothesStore,
         initialIndex: Int? = nil
@@ -58,6 +62,7 @@ struct EvaluationView: View {
         }
 
         durationFieldFocused = false
+        inputWasChanged = false
     }
     
     private func startSession() {
@@ -319,6 +324,7 @@ struct EvaluationView: View {
 
                 HStack(spacing: 8) {
                     Button {
+                        inputWasChanged = true
                         hoursWorn = max(1, hoursWorn - 1)
                         hoursWornText = String(hoursWorn)
                         durationFieldFocused = false
@@ -350,10 +356,15 @@ struct EvaluationView: View {
                                 if evaluationIsLocked {
                                     hoursWornText = String(hoursWorn)
                                 }
+                                
+                                if durationFieldFocused {
+                                    inputWasChanged = true
+                                }
                             }
                         }
 
                     Button {
+                        inputWasChanged = true
                         hoursWorn = min(99, hoursWorn + 1)
                         hoursWornText = String(hoursWorn)
                         durationFieldFocused = false
@@ -400,14 +411,21 @@ struct EvaluationView: View {
                     value: Binding(
                         get: { Double(environmentIndex) },
                         set: {
+                            let newValue: Int
                             if evaluationIsLocked {
-                                environmentIndex = max(
+                                newValue = max(
                                     currentItem?.savedEvaluation?.environmentIndex ?? 0,
                                     Int($0.rounded())
                                 )
                             } else {
-                                environmentIndex = Int($0.rounded())
+                                newValue = Int($0.rounded())
                             }
+
+                            if newValue != environmentIndex {
+                                inputWasChanged = true
+                            }
+
+                            environmentIndex = newValue
                         }
                     ),
                     in: 0...4,
@@ -447,14 +465,21 @@ struct EvaluationView: View {
                     value: Binding(
                         get: { Double(activityIndex) },
                         set: {
+                            let newValue: Int
                             if evaluationIsLocked {
-                                activityIndex = max(
+                                newValue = max(
                                     currentItem?.savedEvaluation?.activityIndex ?? 0,
                                     Int($0.rounded())
                                 )
                             } else {
-                                activityIndex = Int($0.rounded())
+                                newValue = Int($0.rounded())
                             }
+
+                            if newValue != activityIndex {
+                                inputWasChanged = true
+                            }
+
+                            activityIndex = newValue
                         }
                     ),
                     in: 0...4,
@@ -518,6 +543,26 @@ struct EvaluationView: View {
             return "Intense"
         }
     }
+    
+    // making sure the clothes-saved counter doesn't increment unless modified before keeping
+    
+    private func registerSavedGarment(_ id: UUID) {
+        guard inputWasChanged else { return }
+
+        var savedIDs = Set(
+            clothesSavedFromOverWashingIDs
+                .split(separator: ",")
+                .compactMap { UUID(uuidString: String($0)) }
+        )
+
+        guard savedIDs.insert(id).inserted else { return }
+
+        clothesSavedFromOverWashingIDs = savedIDs
+            .map(\.uuidString)
+            .joined(separator: ",")
+
+        clothesSavedFromOverWashing = savedIDs.count
+    }
 
     private func registerDecision(washing: Bool) {
         guard currentIndex < clothesStore.pile.count else { return }
@@ -532,8 +577,8 @@ struct EvaluationView: View {
                 environmentIndex: environmentIndex,
                 activityIndex: activityIndex
             )
-
             clothesStore.savePersistence()
+            registerSavedGarment(currentItem.id)
         }
 
         advanceToNextItem()

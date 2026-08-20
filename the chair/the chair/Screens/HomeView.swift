@@ -9,13 +9,14 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
+    @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 Spacer()
 
-                Text("Clothes saved from over-washing: 67") // hehe kill me
+                Text("Clothes saved from over-washing: \(clothesSavedFromOverWashing)") // when i use this app and it hits 67 i will stop using the app
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
