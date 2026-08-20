@@ -16,7 +16,7 @@ struct GarmentPreviewView: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
-            .foregroundStyle(clothingColor.swiftUIColor)
+            .foregroundStyle(Color(clothingColor.rawValue))
     }
 }
 

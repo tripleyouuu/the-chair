@@ -74,7 +74,8 @@ struct AddClothesView: View {
                     }.buttonStyle(.borderedProminent)
                 }
                 ToolbarItem(placement: .title){
-                    Text("Add a new item")
+                    Text("ADD NEW")
+                        .font(Font.custom("SueEllenFrancisco", size: 32))
                 }
             }
         }
@@ -110,7 +111,7 @@ struct AddClothesView: View {
             } label: {
                 ZStack{
                     Circle()
-                        .fill(Color(color.swiftUIColor))
+                        .fill(Color(color.rawValue))
                         .frame(width: 32)
                     Circle()
                         .stroke(Color(.systemGray4), lineWidth: color == .white ? 2 : 0)

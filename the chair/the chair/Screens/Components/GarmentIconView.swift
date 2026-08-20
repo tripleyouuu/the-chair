@@ -15,7 +15,7 @@ struct GarmentIconView: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
-            .foregroundStyle(item.clothingColor.swiftUIColor)
+            .foregroundStyle(Color(item.clothingColor.rawValue))
     }
 }
 
