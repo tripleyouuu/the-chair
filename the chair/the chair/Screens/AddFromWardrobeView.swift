@@ -9,11 +9,12 @@ import SwiftUI
 
 struct AddFromClosetView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @State var searchTeam : String = ""
+    @State var searchTerm : String = ""
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
     @State private var isSelecting = true
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isSearchFocused: Bool
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -29,51 +30,54 @@ struct AddFromClosetView: View {
                 if (isListView) {
                     closetList
                 } else {
-                    ZStack{
-                        closetDisplay
-                        if (!isSelecting){
-                            VStack{
-                                Spacer()
-                                HStack{
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundStyle(.gray)
-                                    TextField("Search", text: $searchTeam)
-                                }
-                                .padding()
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(.infinity)
-                                .padding(.horizontal,20)
-                                .padding(.vertical,8)
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .ignoresSafeArea(.container, edges: .bottom)
+                    closetDisplay
                 }
             }
-            .toolbar {
-                    ToolbarItem(placement: .bottomBar) {
-                        Button {
-                            clothesStore.addToPile(Array(selectedGarments))
-                            selectedGarments.removeAll()
-                            isSelecting = false
-                            dismiss()
-                        } label: {
-                            Text("Add to pile")
-                        }.buttonStyle(.borderedProminent)
-                    }
-                ToolbarItem(placement: .topBarTrailing) {
+        .ignoresSafeArea(.keyboard, edges: .bottom) 
+        .safeAreaInset(edge: .bottom) {
+                HStack {
+                    searchBar
                     Button {
-                        isListView.toggle()
+                        clothesStore.addToPile(Array(selectedGarments))
+                        selectedGarments.removeAll()
+                        isSelecting = false
+                        dismiss()
                     } label: {
-                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                        Text("Add").padding(10)
                     }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.horizontal, 20)
+            }
+        .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+
+                }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isListView.toggle()
+                } label: {
+                    Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                 }
             }
+        }
+    }
+    
+    private var searchBar: some View {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search", text: $searchTerm)
+                    .focused($isSearchFocused)
+            }
+            .padding()
+            .background(Color(.systemGray5))
+            .cornerRadius(.infinity)
+            .padding(.vertical,8)
     }
     
     private var searchedCloset: [ClothingItem] {
-        clothesStore.search(searchTeam, within: clothesStore.closet)
+        clothesStore.search(searchTerm, within: clothesStore.closet)
     }
 
     private var closetDisplay: some View {
