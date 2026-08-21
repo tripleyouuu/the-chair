@@ -85,6 +85,13 @@ struct HomeView: View {
 
                 Spacer()
             }
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")

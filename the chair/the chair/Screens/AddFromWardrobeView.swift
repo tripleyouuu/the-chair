@@ -51,6 +51,13 @@ struct AddFromClosetView: View {
                     .ignoresSafeArea(.container, edges: .bottom)
                 }
             }
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
             .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text("CLOSET")

@@ -258,6 +258,13 @@ struct EvaluationView: View {
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
         }
         .onTapGesture {
             durationFieldFocused = false

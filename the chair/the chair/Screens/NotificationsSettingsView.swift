@@ -20,7 +20,13 @@ struct NotificationsSettingsView: View {
             }
             .padding(20)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(
+            ZStack {
+                Color("backgroundBase")
+                Image("Texture")
+            }
+            .ignoresSafeArea()
+        )
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
