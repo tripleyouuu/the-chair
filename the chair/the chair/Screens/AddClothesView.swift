@@ -13,7 +13,9 @@ struct AddClothesView: View {
     @State private var clothingMaterial: ClothingMaterial = .dryFit
     @State private var clothingCategory: ClothingCategory = .top
     @State private var clothingSilhouette: ClothingSilhouette = .tShirt
-    @State private var clothingColor: ClothingColor = .white
+    @State private var clothingColor: ClothingColor = .black
+    @State private var showingCamera : Bool = false // control the camera
+    @State private var clothingImage : UIImage?
     
     @Environment(\.dismiss) private var dismiss
     // TODO: set proper default values
@@ -44,24 +46,30 @@ struct AddClothesView: View {
                     materialSection
                     
                 }
-                .padding(.top, 100)
                 .padding(20)
             }
+            
             // TO USE TOAST, ADD THIS
             .toast($toast)
             .background(Color(.systemGray6))
-            .ignoresSafeArea(edges: .all)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         let newClothingNickname : String = clothingNickname == "" ? clothingColor.rawValue + " " + clothingSilhouette.rawValue : clothingNickname
+                        let newClothingImage : String? = clothingImage.flatMap{
+                            ImageStorage.saveImage($0)
+                        }
+
+                        print(newClothingImage ?? "NO IMAGE DATA")
+                        
                         let newClothing : ClothingItem =
                         ClothingItem(
                             nickname: newClothingNickname,
                             clothingMaterial: clothingMaterial,
                             clothingColor: clothingColor,
                             silhouette: clothingSilhouette,
-                            location: .pile
+                            location: .pile,
+                            referenceImageName: newClothingImage
                         )
                         clothesStore.addItem(newClothing)
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.75)){
@@ -78,17 +86,34 @@ struct AddClothesView: View {
                         .font(Font.custom("SueEllenFrancisco", size: 32))
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
         }
     
     private var clothesPreviewNickname : some View {
         VStack(spacing:16){
-            ZStack{
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray6))
+            ZStack(alignment: .bottomTrailing){
+                GarmentPreviewView(clothingColor: $clothingColor, clothingSilhouette: $clothingSilhouette)
                     .frame(width: 200, height: 200)
-                    .overlay {
-                        GarmentPreviewView(clothingColor: $clothingColor, clothingSilhouette: $clothingSilhouette)
+                if let clothingImage {
+                    Image(uiImage: clothingImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(12)
+                } else {
+                    Button(action: {
+                        showingCamera = true
+                    }) {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 24))
+                            .frame(width: 80, height: 80)
+                    }.fullScreenCover(isPresented: $showingCamera){
+                        CameraView(image: $clothingImage)
+                            .ignoresSafeArea()
                     }
+                    .background(Color(.systemGray5))
+                    .cornerRadius(12)
+                }
             }
             TextField("Nickname (optional)", text: $clothingNickname)
                 .textFieldStyle(.plain)
@@ -249,6 +274,7 @@ struct AddClothesView: View {
         clothingCategory = .top
         clothingSilhouette = .tShirt
         clothingColor = .white
+        clothingImage = nil
     }
 }
 

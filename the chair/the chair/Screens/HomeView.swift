@@ -18,7 +18,6 @@ struct HomeView: View {
                 Text("Clothes saved from over-washing: 67") // hehe kill me
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-
                 Spacer()
 
                 Image(systemName: "chair")

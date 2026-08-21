@@ -118,13 +118,12 @@ struct AddFromClosetView: View {
                     GarmentIconView(item: garment)
                         .frame(width: 170, height: 200)
                         .scaleEffect(isSelected ? 1.2 : 1)
-                    if let referenceImageName = garment.referenceImageName {
-                        Image(referenceImageName)
+                    if let imageName = garment.referenceImageName, let image = ImageStorage.loadImage(named: imageName) {
+                        Image(uiImage: image)
                             .resizable()
-                            .scaledToFill()
+                            .scaledToFit()
                             .frame(width: 80, height: 80)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .frame(width: 170, height: 200, alignment: .topTrailing)
+                            .cornerRadius(12)
                     }
                 }
                 Text(garment.nickname ?? "NAME DOES NOT EXIST")
