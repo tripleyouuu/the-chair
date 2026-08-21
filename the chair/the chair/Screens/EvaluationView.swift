@@ -342,7 +342,7 @@ struct EvaluationView: View {
                     } label: {
                         Image(systemName: "minus")
                     }
-                    .disabled(hoursWorn <= (currentItem?.savedEvaluation?.hoursWorn ?? 1) || evaluationIsLocked) // cant reduce in later evals lah
+                    .disabled(hoursWorn <= (currentItem?.savedEvaluation?.hoursWorn ?? 1)) // cant reduce in later evals lah
 
                     TextField("", text: $hoursWornText)
                         .keyboardType(.numberPad)
@@ -364,10 +364,6 @@ struct EvaluationView: View {
 
                                 hoursWorn = min(99, max(minimum, value))
 
-                                if evaluationIsLocked {
-                                    hoursWornText = String(hoursWorn)
-                                }
-                                
                                 if durationFieldFocused {
                                     inputWasChanged = true
                                 }
@@ -503,6 +499,14 @@ struct EvaluationView: View {
                     .frame(height: 48)
             }
             .buttonStyle(.borderedProminent)
+            .tint(verdictIsWash ? .blue : .white)
+            .foregroundStyle(verdictIsWash ? .white : .blue)
+            .overlay {
+                if !verdictIsWash {
+                    RoundedRectangle(cornerRadius: 50)
+                        .stroke(.blue, lineWidth: 1)
+                }
+            }
 
             Button {
                 registerDecision(washing: !verdictIsWash)
