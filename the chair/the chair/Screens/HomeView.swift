@@ -9,27 +9,64 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
+    @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
+    @State private var toast: Toast?
+    
+    private var chairAssetName: String {
+        switch clothesStore.pile.count {
+        case 0:
+            return "Empty Chair"
+        case 1:
+            return "Chair 1"
+        case 2:
+            return "Chair 2"
+        case 3:
+            return "Chair 3"
+        case 4:
+            return "Chair 4"
+        case 5...8:
+            return "Chair 5-8"
+        case 9...12:
+            return "Chair 9-12"
+        default:
+            return "Max Chair"
+        }
+    }
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 Spacer()
 
-                Text("Clothes saved from over-washing: 67") // hehe kill me
+                Text("Clothes saved from over-washing: \(clothesSavedFromOverWashing)") // when i use this app and it hits 67 i will stop using the app
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Spacer()
 
-                Image(systemName: "chair")
-                    .font(.system(size: 240))
-                    .foregroundStyle(.secondary)
-                    .frame(maxHeight: 280)
+                NavigationLink {
+                    PileListView(
+                        clothesStore: clothesStore,
+                        currentIndex: .constant(0),
+                        selectionVersion: .constant(0),
+                        toast: $toast
+                    )
+                } label: {
+                    Image(chairAssetName)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.secondary)
+                        .frame(maxHeight: 280)
+                }
+                .buttonStyle(.plain)
 
                 Spacer()
 
                 VStack(spacing: 16) {
                     NavigationLink {
-                        EvaluationView(clothesStore: clothesStore)
+                        EvaluationView(
+                            clothesStore: clothesStore,
+                            toast: $toast
+                        )
                     } label: {
                         Text("Evaluate")
                             .font(.headline)
@@ -38,6 +75,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .padding(.horizontal, 24)
+                    .disabled(clothesStore.pile.isEmpty)
 
                     Text("The Chair isn't the problem, it's the solution!")
                         .font(.caption)
@@ -46,15 +84,28 @@ struct HomeView: View {
 
                 Spacer()
             }
-            .navigationTitle("The Chair")
-            .toolbarTitleDisplayMode(.inlineLarge)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
                 }
+                .ignoresSafeArea()
+            )
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("THE CHAIR")
+                    .font(Font.custom("SueEllenFrancisco", size: 48))
+                    .padding(.top, 160)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            NotificationsSettingsView(
+                                notificationsStore: NotificationsStore()
+                            )
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                    }
             }
             .safeAreaInset(edge: .bottom) {
                 HStack {
@@ -88,6 +139,7 @@ struct HomeView: View {
                             } label : {
                                 Text("Add from closet")
                             }
+                            .disabled(clothesStore.closet.isEmpty)
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title)
@@ -105,6 +157,7 @@ struct HomeView: View {
                 .padding(.vertical, 8)
             }
         }
+        .toast($toast)
     }
 }
 

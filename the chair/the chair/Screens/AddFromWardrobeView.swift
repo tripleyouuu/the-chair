@@ -36,6 +36,30 @@ struct AddFromClosetView: View {
         .safeAreaInset(edge: .bottom) {
                 HStack {
                     searchBar
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
+            .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("CLOSET")
+                            .font(Font.custom("SueEllenFrancisco", size: 32))
+                            .padding(.top,8)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button {
+                            clothesStore.addToPile(Array(selectedGarments))
+                            selectedGarments.removeAll()
+                            isSelecting = false
+                            dismiss()
+                        } label: {
+                            Text("Add to pile")
+                        }.buttonStyle(.borderedProminent)
+                    }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         clothesStore.addToPile(Array(selectedGarments))
                         selectedGarments.removeAll()

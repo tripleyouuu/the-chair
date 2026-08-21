@@ -9,7 +9,9 @@ import SwiftUI
 struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
     @Binding var currentIndex: Int
-    @Environment(\.dismiss) private var dismiss
+    @Binding var selectionVersion: Int
+    @Binding var toast: Toast?
+//    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
@@ -18,9 +20,12 @@ struct PileListView: View {
                     Array(clothesStore.pile.enumerated().reversed()),
                     id: \.element.id
                 ) { index, item in
-                    Button {
-                        currentIndex = index
-                        dismiss()
+                    NavigationLink {
+                        EvaluationView(
+                            clothesStore: clothesStore,
+                            initialIndex: index,
+                            toast: $toast
+                        )
                     } label: {
                         HStack {
                             GarmentIconView(item: item)
@@ -45,10 +50,22 @@ struct PileListView: View {
                 }
             }
             .padding()
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Pile")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("PILE")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+            }
+        }
     }
 }
 
@@ -58,7 +75,9 @@ struct PileListView: View {
     NavigationStack {
         PileListView(
             clothesStore: store,
-            currentIndex: .constant(store.pile.count - 1)
+            currentIndex: .constant(store.pile.count - 1),
+            selectionVersion: .constant(0),
+            toast: .constant(nil)
         )
     }
 }

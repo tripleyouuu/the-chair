@@ -22,6 +22,13 @@ struct LaundryBasketView: View {
                 Text("Nothing to see here...") // UX writing hallelujah
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .background(
+                        ZStack {
+                            Color("backgroundBase")
+                            Image("Texture")
+                        }
+                        .ignoresSafeArea()
+                    )
             } else {
                 List {
                     ForEach(laundryItems) { item in
@@ -60,15 +67,25 @@ struct LaundryBasketView: View {
                         }
                     }
                 }
+                .background(
+                    ZStack {
+                        Color("backgroundBase")
+                        Image("Texture")
+                    }
+                    .ignoresSafeArea()
+                )
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Laundry Basket")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("LAUNDRY BAG")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showClearAlert = true

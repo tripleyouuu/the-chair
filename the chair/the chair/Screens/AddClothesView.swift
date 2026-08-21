@@ -51,7 +51,13 @@ struct AddClothesView: View {
             
             // TO USE TOAST, ADD THIS
             .toast($toast)
-            .background(Color(.systemGray6))
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -84,6 +90,7 @@ struct AddClothesView: View {
                 ToolbarItem(placement: .title){
                     Text("ADD NEW")
                         .font(Font.custom("SueEllenFrancisco", size: 32))
+                        .padding(.top,8)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
