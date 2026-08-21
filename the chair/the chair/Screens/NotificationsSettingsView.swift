@@ -10,7 +10,7 @@ import SwiftUI
 struct NotificationsSettingsView: View {
     @ObservedObject var notificationsStore: NotificationsStore
 
-    @Environment(\.dismiss) private var dismiss
+//    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
@@ -20,21 +20,15 @@ struct NotificationsSettingsView: View {
             }
             .padding(20)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(
+            ZStack {
+                Color("backgroundBase")
+                Image("Texture")
+            }
+            .ignoresSafeArea()
+        )
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle)
-            }
-        }
     }
 
     private var dailyCheckInSection: some View {

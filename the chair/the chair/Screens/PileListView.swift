@@ -50,6 +50,13 @@ struct PileListView: View {
                 }
             }
             .padding()
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
         }
         .background(Color(.systemGroupedBackground))
         .toolbar {

@@ -85,6 +85,13 @@ struct HomeView: View {
 
                 Spacer()
             }
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")
@@ -92,11 +99,14 @@ struct HomeView: View {
                     .padding(.top, 160)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                    } label: {
-                        Image(systemName: "gearshape")
+                        NavigationLink {
+                            NotificationsSettingsView(
+                                notificationsStore: NotificationsStore()
+                            )
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
                     }
-                }
             }
             .safeAreaInset(edge: .bottom) {
                 HStack {

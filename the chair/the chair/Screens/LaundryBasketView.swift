@@ -22,6 +22,13 @@ struct LaundryBasketView: View {
                 Text("Nothing to see here...") // UX writing hallelujah
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .background(
+                        ZStack {
+                            Color("backgroundBase")
+                            Image("Texture")
+                        }
+                        .ignoresSafeArea()
+                    )
             } else {
                 List {
                     ForEach(laundryItems) { item in
@@ -60,6 +67,13 @@ struct LaundryBasketView: View {
                         }
                     }
                 }
+                .background(
+                    ZStack {
+                        Color("backgroundBase")
+                        Image("Texture")
+                    }
+                    .ignoresSafeArea()
+                )
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
             }

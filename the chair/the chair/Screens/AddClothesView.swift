@@ -49,7 +49,13 @@ struct AddClothesView: View {
             }
             // TO USE TOAST, ADD THIS
             .toast($toast)
-            .background(Color(.systemGray6))
+            .background(
+                ZStack {
+                    Color("backgroundBase")
+                    Image("Texture")
+                }
+                .ignoresSafeArea()
+            )
             .ignoresSafeArea(edges: .all)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
