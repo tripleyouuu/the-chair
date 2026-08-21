@@ -12,6 +12,27 @@ struct HomeView: View {
     @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
     @State private var toast: Toast?
     
+    private var chairAssetName: String {
+        switch clothesStore.pile.count {
+        case 0:
+            return "Empty Chair"
+        case 1:
+            return "Chair 1"
+        case 2:
+            return "Chair 2"
+        case 3:
+            return "Chair 3"
+        case 4:
+            return "Chair 4"
+        case 5...8:
+            return "Chair 5-8"
+        case 9...12:
+            return "Chair 9-12"
+        default:
+            return "Max Chair"
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
@@ -31,7 +52,7 @@ struct HomeView: View {
                         toast: $toast
                     )
                 } label: {
-                    Image("Empty Chair")
+                    Image(chairAssetName)
                         .resizable()
                         .scaledToFit()
                         .foregroundStyle(.secondary)
