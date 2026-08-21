@@ -41,7 +41,6 @@ struct HomeView: View {
                 Text("Clothes saved from over-washing: \(clothesSavedFromOverWashing)") // when i use this app and it hits 67 i will stop using the app
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-
                 Spacer()
 
                 NavigationLink {

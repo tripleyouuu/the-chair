@@ -11,7 +11,7 @@ struct GarmentIconView: View {
     let item: ClothingItem
 
     var body: some View {
-        Image("testCircle")
+        Image("tShirtSilhouette")
             .renderingMode(.template)
             .resizable()
             .scaledToFit()

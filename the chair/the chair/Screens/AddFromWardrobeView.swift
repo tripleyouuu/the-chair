@@ -9,11 +9,12 @@ import SwiftUI
 
 struct AddFromClosetView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @State var searchTeam : String = ""
+    @State var searchTerm : String = ""
     @State var isListView : Bool = false
     @State private var selectedGarments: Set<UUID> = []
     @State private var isSelecting = true
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isSearchFocused: Bool
     
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -29,28 +30,12 @@ struct AddFromClosetView: View {
                 if (isListView) {
                     closetList
                 } else {
-                    ZStack{
-                        closetDisplay
-                        if (!isSelecting){
-                            VStack{
-                                Spacer()
-                                HStack{
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundStyle(.gray)
-                                    TextField("Search", text: $searchTeam)
-                                }
-                                .padding()
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(.infinity)
-                                .padding(.horizontal,20)
-                                .padding(.vertical,8)
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .ignoresSafeArea(.container, edges: .bottom)
+                    closetDisplay
                 }
             }
+        .safeAreaInset(edge: .bottom) {
+                HStack {
+                    searchBar
             .background(
                 ZStack {
                     Color("backgroundBase")
@@ -76,16 +61,43 @@ struct AddFromClosetView: View {
                     }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        isListView.toggle()
+                        clothesStore.addToPile(Array(selectedGarments))
+                        selectedGarments.removeAll()
+                        isSelecting = false
+                        dismiss()
                     } label: {
-                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                        Text("Add").padding(10)
                     }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.horizontal, 20)
+            }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isListView.toggle()
+                } label: {
+                    Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
                 }
             }
+        }
+    }
+    
+    private var searchBar: some View {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search", text: $searchTerm)
+                    .focused($isSearchFocused)
+            }
+            .padding()
+            .background(Color(.systemGray5))
+            .cornerRadius(.infinity)
+            .padding(.vertical,8)
     }
     
     private var searchedCloset: [ClothingItem] {
-        clothesStore.search(searchTeam, within: clothesStore.closet)
+        clothesStore.search(searchTerm, within: clothesStore.closet)
     }
 
     private var closetDisplay: some View {
@@ -99,7 +111,7 @@ struct AddFromClosetView: View {
                         isSelecting: $isSelecting
                     )
                 }
-            }
+            }.padding(.horizontal, 20)
         }
     }
 
@@ -126,36 +138,23 @@ struct AddFromClosetView: View {
         }
         var body : some View {
             VStack{
-                ZStack (){
-                    RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
-                        .frame(width: 170, height: 240)
-                        .foregroundColor(Color(.systemGray5))
-                        .overlay(
-                            RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
-                                .strokeBorder(Color.accentColor, lineWidth: 2)
-                                .opacity(isSelected ? 1 : 0)
-                        )
-
+                ZStack(){
                     GarmentIconView(item: garment)
-                        .frame(width: 120, height: 120)
-                    if let referenceImageName = garment.referenceImageName {
-                        Image(referenceImageName)
+                        .frame(width: 170, height: 200)
+                        .scaleEffect(isSelected ? 1.2 : 1)
+                    if let imageName = garment.referenceImageName, let image = ImageStorage.loadImage(named: imageName) {
+                        Image(uiImage: image)
                             .resizable()
-                            .scaledToFill()
-                            .frame(width: 50, height: 50)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .frame(width: 150, height: 220, alignment: .topTrailing)
-                    }
-
-                    if (isSelecting) {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 24))
-                            .foregroundStyle(Color.accentColor)
-                            .frame(width: 150, height: 220, alignment: .bottomTrailing)
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                            .cornerRadius(12)
                     }
                 }
-
                 Text(garment.nickname ?? "NAME DOES NOT EXIST")
+                    .padding(8)
+                    .padding(.horizontal, 12)
+                    .background(isSelected ? Color("Yellow") : .clear)
+                    .cornerRadius(99)
             }.onTapGesture {
                 if (isSelected) {
                     selectedGarments.remove(garment.id)
