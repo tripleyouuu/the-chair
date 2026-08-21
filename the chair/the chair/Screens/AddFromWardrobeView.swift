@@ -33,7 +33,6 @@ struct AddFromClosetView: View {
                     closetDisplay
                 }
             }
-        .ignoresSafeArea(.keyboard, edges: .bottom) 
         .safeAreaInset(edge: .bottom) {
                 HStack {
                     searchBar
@@ -50,9 +49,6 @@ struct AddFromClosetView: View {
                 .padding(.horizontal, 20)
             }
         .toolbar {
-                ToolbarItem(placement: .bottomBar) {
-
-                }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isListView.toggle()
@@ -91,7 +87,7 @@ struct AddFromClosetView: View {
                         isSelecting: $isSelecting
                     )
                 }
-            }
+            }.padding(.horizontal, 20)
         }
     }
 
@@ -118,36 +114,24 @@ struct AddFromClosetView: View {
         }
         var body : some View {
             VStack{
-                ZStack (){
-                    RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
-                        .frame(width: 170, height: 240)
-                        .foregroundColor(Color(.systemGray5))
-                        .overlay(
-                            RoundedRectangle(cornerSize: CGSize(width: 12, height: 12))
-                                .strokeBorder(Color.accentColor, lineWidth: 2)
-                                .opacity(isSelected ? 1 : 0)
-                        )
-
+                ZStack(){
                     GarmentIconView(item: garment)
-                        .frame(width: 120, height: 120)
+                        .frame(width: 170, height: 200)
+                        .scaleEffect(isSelected ? 1.2 : 1)
                     if let referenceImageName = garment.referenceImageName {
                         Image(referenceImageName)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 50, height: 50)
+                            .frame(width: 80, height: 80)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .frame(width: 150, height: 220, alignment: .topTrailing)
-                    }
-
-                    if (isSelecting) {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 24))
-                            .foregroundStyle(Color.accentColor)
-                            .frame(width: 150, height: 220, alignment: .bottomTrailing)
+                            .frame(width: 170, height: 200, alignment: .topTrailing)
                     }
                 }
-
                 Text(garment.nickname ?? "NAME DOES NOT EXIST")
+                    .padding(8)
+                    .padding(.horizontal, 12)
+                    .background(isSelected ? Color("Yellow") : .clear)
+                    .cornerRadius(99)
             }.onTapGesture {
                 if (isSelected) {
                     selectedGarments.remove(garment.id)
