@@ -11,25 +11,38 @@ struct NotificationsSettingsView: View {
     @ObservedObject var notificationsStore: NotificationsStore
 
 //    @Environment(\.dismiss) private var dismiss
+    
+// TODO: fix the fucking padding space wtv
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack() {
                 dailyCheckInSection
                 laundryReminderSection
             }
             .padding(20)
+            
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("SETTINGS")
+                    .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .padding(.top,8)
+                    .foregroundStyle(.deepBrown)
+            }
         }
         .background(
             ZStack {
                 Color("backgroundBase")
                 Image("Texture")
             }
-            .ignoresSafeArea()
+                .ignoresSafeArea()
         )
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationTitle("Settings")
+//        .navigationBarTitleDisplayMode(.inline)
     }
+    
+    
 
     private var dailyCheckInSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -37,11 +50,13 @@ struct NotificationsSettingsView: View {
                 HStack {
                     Image(systemName: "clock.badge")
                     Text("Daily Check-In")
+                        .foregroundStyle(.deepBrown)
                     Spacer()
                     Toggle("", isOn: Binding(
                         get: { notificationsStore.dailyCheckInEnabled },
                         set: { notificationsStore.setDailyCheckIn(enabled: $0) }
                     ))
+                    .tint(.darkGreen)
                     .labelsHidden()
                 }
                 .padding()
@@ -51,6 +66,7 @@ struct NotificationsSettingsView: View {
 
                     HStack {
                         Text("Reminder Time")
+                            .foregroundStyle(.deepBrown)
                         Spacer()
                         DatePicker(
                             "",
@@ -70,7 +86,8 @@ struct NotificationsSettingsView: View {
 
             Text("Get reminded to log any new additions to your Pile each day.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.sienna)
+                .opacity(0.8)
         }
     }
 
@@ -80,11 +97,13 @@ struct NotificationsSettingsView: View {
                 HStack {
                     Image(systemName: "washer")
                     Text("Laundry Day Reminder")
+                        .foregroundStyle(.deepBrown)
                     Spacer()
                     Toggle("", isOn: Binding(
                         get: { notificationsStore.laundryReminderEnabled },
                         set: { notificationsStore.setLaundryReminder(enabled: $0) }
                     ))
+                    .tint(.darkGreen)
                     .labelsHidden()
                 }
                 .padding()
@@ -94,6 +113,7 @@ struct NotificationsSettingsView: View {
 
                     HStack {
                         Text("Reminder Day")
+                            .foregroundStyle(.deepBrown)
                         Spacer()
                         Picker("", selection: Binding(
                             get: { notificationsStore.laundryReminderDay },
@@ -103,6 +123,7 @@ struct NotificationsSettingsView: View {
                                 Text(day.name).tag(day)
                             }
                         }
+                        .tint(.sienna)
                         .pickerStyle(.menu)
                         .labelsHidden()
                     }
@@ -112,6 +133,7 @@ struct NotificationsSettingsView: View {
 
                     HStack {
                         Text("Reminder Time")
+                            .foregroundStyle(.deepBrown)
                         Spacer()
                         DatePicker(
                             "",
@@ -131,7 +153,8 @@ struct NotificationsSettingsView: View {
 
             Text("Make sure you never miss laundry day with a weekly nudge from The Chair to evaluate your pile before washing!")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.sienna)
+                .opacity(0.8)
         }
     }
 
