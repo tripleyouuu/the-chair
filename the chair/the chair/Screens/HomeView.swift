@@ -68,13 +68,17 @@ struct HomeView: View {
                             toast: $toast
                         )
                     } label: {
-                        Text("Evaluate")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 48)
+                        ZStack{
+                            Image("siennaButton")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.secondary)
+                            Text("Evaluate")
+                                .font(.headline)
+                                .foregroundStyle(.offWhite)
+                        }
                     }
                     .tint(.sienna)
-                    .buttonStyle(.borderedProminent)
                     .padding(.horizontal, 24)
                     .disabled(clothesStore.pile.isEmpty)
 
@@ -96,42 +100,52 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")
-                    .font(Font.custom("SueEllenFrancisco", size: 48))
-                    .foregroundStyle(.deepBrown)
-                    .padding(.top, 160)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink {
-                            NotificationsSettingsView(
-                                notificationsStore: NotificationsStore()
-                            )
-                        } label: {
-                            Image(systemName: "gearshape")
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.backgroundBase)
-                        .buttonBorderShape(.circle)
-                        
+                        .font(Font.custom("SueEllenFrancisco", size: 48))
+                        .foregroundStyle(.deepBrown)
+                        .padding(.top, 160)
                     }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        NotificationsSettingsView(
+                            notificationsStore: NotificationsStore()
+                        )
+                    } label: {
+                        ZStack{
+                            Image("secondaryButton")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth:44)
+                            Image(systemName: "gearshape")
+                                .foregroundStyle(.sienna)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+                .sharedBackgroundVisibility(.hidden)
             }
+
             .safeAreaInset(edge: .bottom) {
                 HStack {
                     VStack(spacing: 4) {
                         NavigationLink {
                             LaundryBasketView(clothesStore: clothesStore)
                         } label: {
-                            Image(systemName: "washer")
-                                .font(.title)
-                                .frame(width: 44, height: 44)
+                            ZStack{
+                                Image("secondaryButton")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth:64)
+                                Image(systemName: "washer")
+                                    .font(.title)
+                                    .foregroundStyle(.sienna)
+                            }
                         }
-                        .foregroundStyle(.offWhite)
-                        .buttonStyle(.borderedProminent)
-                        .tint(.backgroundBase)
-                        .buttonBorderShape(.circle)
 
                         Text("Laundry bag")
                             .font(.caption)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(.deepBrown)
                     }
 
                     Spacer()
@@ -150,14 +164,17 @@ struct HomeView: View {
                             }
                             .disabled(clothesStore.closet.isEmpty)
                         } label: {
-                            Image(systemName: "plus")
-                                .font(.title)
-                                .frame(width: 44, height: 44)
+                            ZStack{
+                                Image("secondaryButton")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth:64)
+                                Image(systemName: "plus")
+                                    .font(.title)
+                                    .foregroundStyle(.sienna)
+                            }
                         }
-                        .foregroundStyle(.offWhite)
-                        .buttonStyle(.borderedProminent)
-                        .tint(.backgroundBase)
-                        .buttonBorderShape(.circle)
 
                         Text("Add to pile")
                             .font(.caption)
