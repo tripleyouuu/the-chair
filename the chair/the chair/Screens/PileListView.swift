@@ -67,7 +67,7 @@ struct PileListView: View {
                     .padding(.top,8)
             }
         }
-        .customBackButton()
+        .backButton(.custom)
     }
 }
 

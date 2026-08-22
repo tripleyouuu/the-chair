@@ -1,65 +1,72 @@
 //
 //  CustomBackButton.swift
 //
-//  Replaces the system back button with a custom asset image
-//  (no Liquid Glass, since it's not a system-style bar item).
-//  Manually re-enables swipe-to-go-back since a custom
-//  leftBarButtonItem disables it by default.
-//
-//  Tradeoff vs. the native back button: no long-press
-//  navigation-stack menu. That's a system feature tied
-//  specifically to the real backBarButtonItem.
+//  Single back-button controller for a screen: either shows a custom
+//  asset (with swipe-to-go-back re-enabled) or hides the back button
+//  entirely. Deliberately ONE representable type driven by a mode,
+//  rather than two different types swapped via if/else — swapping
+//  types forces SwiftUI to tear down/remount the invisible child
+//  controller on every toggle, which raced two async closures against
+//  each other and could leave a dead, orphaned button on screen.
 //
 
 import SwiftUI
 import UIKit
 
-struct CustomBackButtonModifier: UIViewControllerRepresentable {
+enum BackButtonMode {
+    case custom
+    case hidden
+}
+
+struct BackButtonModifier: UIViewControllerRepresentable {
+    let mode: BackButtonMode
+
     func makeUIViewController(context: Context) -> UIViewController {
         UIViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        let mode = self.mode // snapshot the value this update was called with
         DispatchQueue.main.async {
             guard let navigationController = uiViewController.navigationController,
                   navigationController.viewControllers.count > 1,
                   let topItem = navigationController.viewControllers.last?.navigationItem else { return }
 
-            // Only set it once per screen
-            if topItem.leftBarButtonItem?.tag != 9999 {
-                let backImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysOriginal)
+            switch mode {
+            case .hidden:
+                topItem.leftBarButtonItem = nil
+                topItem.hidesBackButton = true
 
-                // Tune these two to match the size/position of your other
-                // nav bar buttons (e.g. the trailing gear button).
-                let buttonSize: CGFloat = 44
-                let leadingInset: CGFloat = 0
+            case .custom:
+                if topItem.leftBarButtonItem?.tag != 9999 {
+                    let backImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysOriginal)
 
-                let button = UIButton(type: .custom)
-                button.setImage(backImage, for: .normal)
-                button.imageView?.contentMode = .scaleAspectFit
-                button.addTarget(context.coordinator, action: #selector(Coordinator.goBack), for: .touchUpInside)
-                button.frame = CGRect(x: leadingInset, y: 0, width: buttonSize, height: buttonSize)
+                    let buttonSize: CGFloat = 44
+                    let leadingInset: CGFloat = 0
 
-                // A container gives the button standard leading padding and
-                // lets the nav bar vertically center it like a system item.
-                let container = UIView(frame: CGRect(x: 0, y: 0, width: buttonSize + leadingInset, height: buttonSize))
-                container.addSubview(button)
+                    let button = UIButton(type: .custom)
+                    button.setImage(backImage, for: .normal)
+                    button.imageView?.contentMode = .scaleAspectFit
+                    button.addTarget(context.coordinator, action: #selector(Coordinator.goBack), for: .touchUpInside)
+                    button.frame = CGRect(x: leadingInset, y: 0, width: buttonSize, height: buttonSize)
 
-                let barItem = UIBarButtonItem(customView: container)
-                barItem.tag = 9999
-                if #available(iOS 26.0, *) {
-                    barItem.hidesSharedBackground = true
+                    let container = UIView(frame: CGRect(x: 0, y: 0, width: buttonSize + leadingInset, height: buttonSize))
+                    container.addSubview(button)
+
+                    let barItem = UIBarButtonItem(customView: container)
+                    barItem.tag = 9999
+                    if #available(iOS 26.0, *) {
+                        barItem.hidesSharedBackground = true
+                    }
+
+                    topItem.leftBarButtonItem = barItem
+                    topItem.hidesBackButton = true
                 }
 
-                topItem.leftBarButtonItem = barItem
-                topItem.hidesBackButton = true
+                context.coordinator.navigationController = navigationController
+                navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
+                navigationController.interactivePopGestureRecognizer?.isEnabled = true
             }
-
-            // Custom leftBarButtonItem disables the interactive swipe gesture
-            // by default — manually re-enable it.
-            context.coordinator.navigationController = navigationController
-            navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
-            navigationController.interactivePopGestureRecognizer?.isEnabled = true
         }
     }
 
@@ -81,7 +88,10 @@ struct CustomBackButtonModifier: UIViewControllerRepresentable {
 }
 
 extension View {
-    func customBackButton() -> some View {
-        self.background(CustomBackButtonModifier().frame(width: 0, height: 0))
+    /// Set the back button for this screen. Pass `.custom` for your
+    /// asset button (with swipe-to-go-back), or `.hidden` for no
+    /// back button at all.
+    func backButton(_ mode: BackButtonMode) -> some View {
+        self.background(BackButtonModifier(mode: mode).frame(width: 0, height: 0))
     }
 }

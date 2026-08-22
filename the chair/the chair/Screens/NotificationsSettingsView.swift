@@ -38,7 +38,7 @@ struct NotificationsSettingsView: View {
             }
                 .ignoresSafeArea()
         )
-        .customBackButton()
+        .backButton(.custom)
 //        .navigationTitle("Settings")
 //        .navigationBarTitleDisplayMode(.inline)
     }

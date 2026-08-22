@@ -81,6 +81,7 @@ struct HomeView: View {
                     .tint(.sienna)
                     .padding(.horizontal, 24)
                     .disabled(clothesStore.pile.isEmpty)
+                    // TODO: disabled asset needed for fat button
 
                     Text("The Chair isn't the problem, it's the solution!")
                         .font(.subheadline)

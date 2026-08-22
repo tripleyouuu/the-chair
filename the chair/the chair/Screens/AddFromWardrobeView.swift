@@ -40,6 +40,7 @@ struct AddFromClosetView: View {
             }
                 .ignoresSafeArea()
         )
+        .backButton(isListView ? .hidden : .custom)
         .safeAreaInset(edge: .bottom) {
             HStack {
                 searchBar
@@ -60,15 +61,24 @@ struct AddFromClosetView: View {
                         .font(Font.custom("SueEllenFrancisco", size: 32))
                         .padding(.top,8)
                 }
-            }
-            .toolbar {
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isListView.toggle()
                     } label: {
-                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                        ZStack{
+                            Image("secondaryButton")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth:44)
+                            Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                                .foregroundStyle(.sienna)
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
+                .sharedBackgroundVisibility(.hidden)
             }
         }
         
@@ -152,7 +162,6 @@ struct AddFromClosetView: View {
                     }
                     
                 }
-                .customBackButton()
             }
         }
 }

@@ -91,12 +91,20 @@ struct LaundryBasketView: View {
                 Button {
                     showClearAlert = true
                 } label: {
-                    Image(systemName: "bubbles.and.sparkles")
+                    ZStack{
+                        Image("primaryButton")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth:44)
+                        Image(systemName: "bubbles.and.sparkles")
+                            .foregroundStyle(.offWhite)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.backgroundBase)
-                .buttonBorderShape(.circle)
+                .buttonStyle(.plain)
             }
+            .sharedBackgroundVisibility(.hidden)
+            // TODO: add disabled if list is empty + its asset implementation
             
         }
         .alert("Clear laundry basket", isPresented: $showClearAlert) {
@@ -109,7 +117,7 @@ struct LaundryBasketView: View {
             Text("This will mark all clothes in the list as washed, and return them to the closet.")
         }
         .tint(.offWhite)
-        .customBackButton()
+        .backButton(.custom)
     }
 
 }
