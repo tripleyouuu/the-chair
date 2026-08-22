@@ -94,6 +94,7 @@ struct AddClothesView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .customBackButton()
         }
     
     private var clothesPreviewNickname : some View {

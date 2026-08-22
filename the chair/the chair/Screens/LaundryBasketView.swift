@@ -109,6 +109,7 @@ struct LaundryBasketView: View {
             Text("This will mark all clothes in the list as washed, and return them to the closet.")
         }
         .tint(.offWhite)
+        .customBackButton()
     }
 
 }

@@ -152,6 +152,7 @@ struct AddFromClosetView: View {
                     }
                     
                 }
+                .customBackButton()
             }
         }
 }
