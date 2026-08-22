@@ -39,8 +39,8 @@ struct HomeView: View {
                 Spacer()
 
                 Text("Clothes saved from over-washing: \(clothesSavedFromOverWashing)") // when i use this app and it hits 67 i will stop using the app
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.sienna)
+                    .opacity(0.8)
                 Spacer()
 
                 NavigationLink {
@@ -73,13 +73,15 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 48)
                     }
+                    .tint(.sienna)
                     .buttonStyle(.borderedProminent)
                     .padding(.horizontal, 24)
                     .disabled(clothesStore.pile.isEmpty)
 
                     Text("The Chair isn't the problem, it's the solution!")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.subheadline)
+                        .foregroundStyle(.sienna)
+                        .opacity(0.8)
                 }
 
                 Spacer()
@@ -95,6 +97,7 @@ struct HomeView: View {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")
                     .font(Font.custom("SueEllenFrancisco", size: 48))
+                    .foregroundStyle(.deepBrown)
                     .padding(.top, 160)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -105,6 +108,10 @@ struct HomeView: View {
                         } label: {
                             Image(systemName: "gearshape")
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.backgroundBase)
+                        .buttonBorderShape(.circle)
+                        
                     }
             }
             .safeAreaInset(edge: .bottom) {
@@ -117,7 +124,9 @@ struct HomeView: View {
                                 .font(.title)
                                 .frame(width: 44, height: 44)
                         }
-                        .buttonStyle(.glass)
+                        .foregroundStyle(.offWhite)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.backgroundBase)
                         .buttonBorderShape(.circle)
 
                         Text("Laundry bag")
@@ -145,7 +154,9 @@ struct HomeView: View {
                                 .font(.title)
                                 .frame(width: 44, height: 44)
                         }
-                        .buttonStyle(.glass)
+                        .foregroundStyle(.offWhite)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.backgroundBase)
                         .buttonBorderShape(.circle)
 
                         Text("Add to pile")
