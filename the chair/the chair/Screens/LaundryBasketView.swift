@@ -93,8 +93,11 @@ struct LaundryBasketView: View {
                 } label: {
                     Image(systemName: "bubbles.and.sparkles")
                 }
-                .disabled(laundryItems.isEmpty)
+                .buttonStyle(.borderedProminent)
+                .tint(.backgroundBase)
+                .buttonBorderShape(.circle)
             }
+            
         }
         .alert("Clear laundry basket", isPresented: $showClearAlert) {
             Button("Confirm", role: .destructive) {
