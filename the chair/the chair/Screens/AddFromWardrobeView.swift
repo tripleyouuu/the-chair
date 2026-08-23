@@ -35,8 +35,7 @@ struct AddFromClosetView: View {
         }
         .background(
             ZStack {
-                Color("backgroundBase")
-                Image("Texture")
+                Image("wardrobeBackground")
             }
                 .ignoresSafeArea()
         )
@@ -101,7 +100,17 @@ struct AddFromClosetView: View {
         
         private var closetDisplay: some View {
             ScrollView(.horizontal){
-                LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
+                HStack() {
+                    ForEach(searchedCloset) {
+                        garment in
+                        closetDisplayItems(
+                            garment: garment,
+                            selectedGarments: $selectedGarments,
+                            isSelecting: $isSelecting
+                        )
+                    }
+                }.padding(.horizontal, 20)
+                HStack() {
                     ForEach(searchedCloset) {
                         garment in
                         closetDisplayItems(
@@ -137,9 +146,10 @@ struct AddFromClosetView: View {
             }
             var body : some View {
                 VStack{
-                    ZStack(){
+                    ZStack(alignment: .top){
+                        Image("hanger")
                         GarmentIconView(item: garment)
-                            .frame(width: 170, height: 200)
+                            .frame(width: 170)
                             .scaleEffect(isSelected ? 1.2 : 1)
                         if let imageName = garment.referenceImageName, let image = ImageStorage.loadImage(named: imageName) {
                             Image(uiImage: image)

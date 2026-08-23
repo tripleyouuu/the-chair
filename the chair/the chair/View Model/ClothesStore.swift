@@ -55,10 +55,18 @@ final class ClothesStore: ObservableObject {
                 referenceImageName: "testCircle"
             ),
             ClothingItem(
-                nickname: "Rain Jacket",
+                nickname: "Test",
                 clothingMaterial: .synthetic,
                 clothingColor: .black,
-                silhouette: .jacket,
+                silhouette: .dress,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Dress Test",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .dress,
                 location: .wardrobe,
                 referenceImageName: "testCircle"
             )
