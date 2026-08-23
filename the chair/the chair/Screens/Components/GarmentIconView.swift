@@ -21,6 +21,7 @@ struct GarmentIconView: View {
             Image("\(item.silhouette.rawValue)Outline")
                 .resizable()
                 .scaledToFit()
+                .foregroundStyle(Color("Black"))
         }
     }
 }
