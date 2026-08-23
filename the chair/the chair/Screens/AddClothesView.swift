@@ -84,9 +84,19 @@ struct AddClothesView: View {
                         }
                         resetForm()
                     } label: {
-                        Image(systemName: "checkmark")
-                    }.buttonStyle(.borderedProminent)
+                        ZStack{
+                            Image("primaryButton")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth:44)
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.offWhite)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
+                .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .title){
                     Text("ADD NEW")
                         .font(Font.custom("SueEllenFrancisco", size: 32))
@@ -94,6 +104,7 @@ struct AddClothesView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .backButton(.custom)
         }
     
     private var clothesPreviewNickname : some View {
@@ -108,6 +119,9 @@ struct AddClothesView: View {
                         .frame(width: 80, height: 80)
                         .cornerRadius(12)
                 } else {
+                    // @ mask
+                    // TODO: add disabled if required fields not filled
+                    // TODO: add auto nickname logic if not already done
                     Button(action: {
                         showingCamera = true
                     }) {

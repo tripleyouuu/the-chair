@@ -15,7 +15,7 @@ struct PileListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16) {
+            LazyVStack {
                 ForEach(
                     Array(clothesStore.pile.enumerated().reversed()),
                     id: \.element.id
@@ -34,13 +34,14 @@ struct PileListView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                             Text(item.nickname ?? "Nickname")
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(.deepBrown)
 
                             Spacer()
 
                             Image(systemName: "chevron.right")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.sienna)
+                                .opacity(0.8)
                         }
                         .padding()
                         .background(.background)
@@ -66,6 +67,7 @@ struct PileListView: View {
                     .padding(.top,8)
             }
         }
+        .backButton(.custom)
     }
 }
 

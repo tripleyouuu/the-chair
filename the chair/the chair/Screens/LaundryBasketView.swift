@@ -21,7 +21,8 @@ struct LaundryBasketView: View {
             if laundryItems.isEmpty {
                 Text("Nothing to see here...") // UX writing hallelujah
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.sienna)
+                    .opacity(0.8)
                     .background(
                         ZStack {
                             Color("backgroundBase")
@@ -35,11 +36,10 @@ struct LaundryBasketView: View {
                         HStack(spacing: 16) {
                             GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
-                                .background(.gray.opacity(0.1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                             Text(item.nickname ?? "Nickname")
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(.deepBrown)
 
                             Spacer()
                         }
@@ -63,7 +63,7 @@ struct LaundryBasketView: View {
                             } label: {
                                 Image(systemName: "drop.degreesign")
                             }
-                            .tint(.blue)
+                            .tint(.deepBlue)
                         }
                     }
                 }
@@ -83,6 +83,7 @@ struct LaundryBasketView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("LAUNDRY BAG")
+                    .foregroundStyle(.deepBrown)
                     .font(Font.custom("SueEllenFrancisco", size: 32))
                     .padding(.top,8)
             }
@@ -90,10 +91,21 @@ struct LaundryBasketView: View {
                 Button {
                     showClearAlert = true
                 } label: {
-                    Image(systemName: "bubbles.and.sparkles")
+                    ZStack{
+                        Image("primaryButton")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth:44)
+                        Image(systemName: "bubbles.and.sparkles")
+                            .foregroundStyle(.offWhite)
+                    }
                 }
-                .disabled(laundryItems.isEmpty)
+                .buttonStyle(.plain)
             }
+            .sharedBackgroundVisibility(.hidden)
+            // TODO: add disabled if list is empty + its asset implementation
+            
         }
         .alert("Clear laundry basket", isPresented: $showClearAlert) {
             Button("Confirm", role: .destructive) {
@@ -104,6 +116,8 @@ struct LaundryBasketView: View {
         } message: {
             Text("This will mark all clothes in the list as washed, and return them to the closet.")
         }
+        .tint(.offWhite)
+        .backButton(.custom)
     }
 
 }

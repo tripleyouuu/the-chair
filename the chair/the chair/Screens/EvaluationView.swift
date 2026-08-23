@@ -196,15 +196,29 @@ struct EvaluationView: View {
                     .font(Font.custom("SueEllenFrancisco", size: 32))
                     .padding(.top,8)
             }
+            
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     finishSession()
                 } label: {
-                    Image(systemName: "chevron.left")
+                    ZStack{
+                        Image("secondaryButton")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth:44)
+                        Image(systemName: "chevron.left")
+                            .foregroundStyle(.sienna)
+                    }
                 }
+                .buttonStyle(.plain)
             }
+            .sharedBackgroundVisibility(.hidden)
 
-            // a custom back button was needed to make the go-straight-home logic work
+            // ^ a custom back button was needed to make the go-straight-home logic work
+            
+            
+            
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
                     PileListView(
@@ -214,9 +228,19 @@ struct EvaluationView: View {
                         toast: $toast
                     )
                 } label: {
-                    Image(systemName: "list.dash")
+                    ZStack{
+                        Image("secondaryButton")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth:44)
+                        Image(systemName: "list.dash")
+                            .foregroundStyle(.sienna)
+                    }
                 }
+                .buttonStyle(.plain)
             }
+            .sharedBackgroundVisibility(.hidden)
         }
         .onAppear {
             startSession()
