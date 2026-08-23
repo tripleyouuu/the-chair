@@ -59,7 +59,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .white,
                 silhouette: .tShirt,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Office Button Up",
@@ -67,7 +67,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .white,
                 silhouette: .buttonUpShirt,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Gym Tank",
@@ -75,7 +75,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .tankTop,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
 
             // Bottoms
@@ -85,7 +85,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .pants,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Lounge Shorts",
@@ -93,7 +93,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .shorts,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Pleated Skirt",
@@ -101,7 +101,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .skirt,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
 
             // Full Body
@@ -111,7 +111,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .white,
                 silhouette: .dress,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Party Mini",
@@ -119,7 +119,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .miniDress,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Utility Jumpsuit",
@@ -127,7 +127,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .jumpsuit,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
 
             // Outerwear
@@ -137,7 +137,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .jacket,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Knit Cardigan",
@@ -145,7 +145,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .white,
                 silhouette: .cardigan,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             ),
             ClothingItem(
                 nickname: "Workout Hoodie",
@@ -153,7 +153,7 @@ final class ClothesStore: ObservableObject {
                 clothingColor: .black,
                 silhouette: .hoodie,
                 location: .wardrobe,
-                referenceImageName: "testCircle"
+                referenceImageName: "thumbnail"
             )
         ]
 
