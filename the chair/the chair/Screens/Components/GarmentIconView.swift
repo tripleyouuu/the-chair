@@ -11,11 +11,17 @@ struct GarmentIconView: View {
     let item: ClothingItem
 
     var body: some View {
-        Image("\(item.silhouette.rawValue)")
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundStyle(Color(item.clothingColor.rawValue))
+        ZStack {
+            Image("\(item.silhouette.rawValue)")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(Color(item.clothingColor.rawValue))
+
+            Image("\(item.silhouette.rawValue)Outline")
+                .resizable()
+                .scaledToFit()
+        }
     }
 }
 

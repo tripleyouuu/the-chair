@@ -187,9 +187,17 @@ struct EvaluationView: View {
                 )
             }
         }
+        .background(
+            ZStack {
+                Color("backgroundBase")
+                Image("Texture")
+            }
+            .ignoresSafeArea()
+        )
         .navigationTitle("Evaluate")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("EVALUATE")
@@ -214,6 +222,7 @@ struct EvaluationView: View {
                 .buttonStyle(.plain)
             }
             .sharedBackgroundVisibility(.hidden)
+            
 
             // ^ a custom back button was needed to make the go-straight-home logic work
             
@@ -282,13 +291,6 @@ struct EvaluationView: View {
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
-            .background(
-                ZStack {
-                    Color("backgroundBase")
-                    Image("Texture")
-                }
-                .ignoresSafeArea()
-            )
         }
         .onTapGesture {
             durationFieldFocused = false
