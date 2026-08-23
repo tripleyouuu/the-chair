@@ -10,8 +10,8 @@ import Foundation
 enum ClothingCategory: String, CaseIterable, Codable, Identifiable {
     case top = "Top"
     case bottom = "Bottom"
-    case singlePiece = "Single-Piece"
-    case outerWear = "Outerwear"
+    case singlePiece = "Full"
+    case outerWear = "Outer"
 
     var id: String { rawValue }
 
