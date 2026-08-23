@@ -85,6 +85,7 @@ struct LaundryBasketView: View {
                 Text("LAUNDRY BAG")
                     .foregroundStyle(.deepBrown)
                     .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .fontDesign(nil)
                     .padding(.top,8)
             }
             ToolbarItem(placement: .topBarTrailing) {

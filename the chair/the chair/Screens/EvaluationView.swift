@@ -7,10 +7,15 @@
 
 import SwiftUI
 
+enum ClothesRoute: Hashable {
+    case pileList
+    case evaluate(index: Int?)
+}
+
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @Environment(\.dismiss) private var dismiss
     @Binding var toast: Toast?
+    @Binding var path: NavigationPath
     @State private var currentIndex: Int
     @State private var hoursWorn = 8
     @State private var hoursWornText = "8"
@@ -23,15 +28,19 @@ struct EvaluationView: View {
     @State private var selectionVersion = 0
     @State private var inputWasChanged = false
     @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
-    @AppStorage("clothesSavedFromOverWashingIDs") private var clothesSavedFromOverWashingIDs = ""
-    
+
+
+    private let cardCornerRadius: CGFloat = 24
+
     init(
         clothesStore: ClothesStore,
         initialIndex: Int? = nil,
-        toast: Binding<Toast?>
+        toast: Binding<Toast?>,
+        path: Binding<NavigationPath>
     ) {
         self.clothesStore = clothesStore
         self._toast = toast
+        self._path = path
         let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
     }
@@ -90,7 +99,8 @@ struct EvaluationView: View {
             toast = Toast(message: "Sorted all items in pile!")
         }
 
-        dismiss()
+        // always go home
+        path = NavigationPath()
     }
     
     private func advanceToNextItem() {
@@ -160,7 +170,7 @@ struct EvaluationView: View {
 
         return currentItem.totalWearability
             - currentItem.usedWearability
-            - currentSession.usedWearability // we don't have past session persistence logic yet, but this should work once we do
+            - currentSession.usedWearability
     }
 
     private var verdictIsWash: Bool {
@@ -168,11 +178,23 @@ struct EvaluationView: View {
     }
 
     private var verdictText: String {
-        verdictIsWash ? "WASH" : "KEEP"
+        verdictIsWash ? "Wash" : "Keep"
+    }
+
+    private var verdictButtonAsset: String {
+        verdictIsWash ? "cornflowerBlueButton" : "tanButton"
     }
 
     private var secondaryActionText: String {
-        verdictIsWash ? "No, I'll keep" : "No, I'll wash"
+        verdictIsWash ? "Nah, I'll keep" : "Nah, I'll wash"
+    }
+
+    private var screenBackground: some View {
+        ZStack {
+            Color("backgroundBase")
+            Image("Texture")
+        }
+        .ignoresSafeArea()
     }
 
     var body: some View {
@@ -185,15 +207,10 @@ struct EvaluationView: View {
                     systemImage: "questionmark.circle.dashed",
                     description: Text("Your laundry pile is empty.")
                 )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .background(
-            ZStack {
-                Color("backgroundBase")
-                Image("Texture")
-            }
-            .ignoresSafeArea()
-        )
+        .background(screenBackground)
         .navigationTitle("Evaluate")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -202,22 +219,19 @@ struct EvaluationView: View {
             ToolbarItem(placement: .principal) {
                 Text("EVALUATE")
                     .font(Font.custom("SueEllenFrancisco", size: 32))
-                    .padding(.top,8)
+                    .fontDesign(nil)
+                    .foregroundStyle(.deepBrown)
+                    .padding(.top, 8)
             }
             
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     finishSession()
                 } label: {
-                    ZStack{
-                        Image("secondaryButton")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth:44)
-                        Image(systemName: "chevron.left")
-                            .foregroundStyle(.sienna)
-                    }
+                    Image("backButton")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
             }
@@ -229,22 +243,15 @@ struct EvaluationView: View {
             
             
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    PileListView(
-                        clothesStore: clothesStore,
-                        currentIndex: $currentIndex,
-                        selectionVersion: $selectionVersion,
-                        toast: $toast
-                    )
-                } label: {
+                NavigationLink(value: ClothesRoute.pileList) {
                     ZStack{
-                        Image("secondaryButton")
+                        Image("primaryButton")
                             .resizable()
                             .scaledToFit()
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth:44)
+                            .frame(width: 44, height: 44)
                         Image(systemName: "list.dash")
-                            .foregroundStyle(.sienna)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(.offWhite)
                     }
                 }
                 .buttonStyle(.plain)
@@ -266,31 +273,34 @@ struct EvaluationView: View {
     }
 
     private func evaluationContent(for item: ClothingItem) -> some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                garmentPreview(for: item)
-                
-                // fuckass returns
+        VStack(spacing: 0) {
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(spacing: 20) {
+                        garmentPreview(for: item)
 
-                if item.clothingMaterial == .silk {
-                    silkInfoSection
-                } else if item.clothingMaterial == .dryFit {
-                    dryFitInfoSection
-                } else if item.clothingColor == .white &&
-                            item.clothingMaterial != .denim &&
-                            item.clothingMaterial != .wool &&
-                            item.clothingMaterial != .silk {
-                    whiteInfoSection
-                } else {
-                    durationSection
-                    environmentSection
-                    activitySection
+                        // The card sizes to its content. These spacers centre it in
+                        // the room left below the garment, and collapse to nothing
+                        // once the card is tall enough to fill the viewport — so the
+                        // full input form still scrolls normally.
+                        Spacer(minLength: 0)
+
+                        evaluationCard(for: item)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
+                    .frame(minHeight: proxy.size.height)
                 }
-
-                verdictSection
+                .scrollDismissesKeyboard(.interactively)
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
+
+            // verdict buttons pinned to a fixed position
+            verdictSection
+                .padding(.horizontal, 24)
+                .padding(.bottom, 16)
         }
         .onTapGesture {
             durationFieldFocused = false
@@ -315,130 +325,194 @@ struct EvaluationView: View {
         }
     }
 
+    private func evaluationCard(for item: ClothingItem) -> some View {
+        VStack(spacing: 0) {
+            if item.clothingMaterial == .silk {
+                infoSection(silkInfoText)
+            } else if item.clothingMaterial == .dryFit {
+                infoSection(dryFitInfoText)
+            } else if item.clothingColor == .white &&
+                        item.clothingMaterial != .denim &&
+                        item.clothingMaterial != .wool &&
+                        item.clothingMaterial != .silk {
+                infoSection(whiteInfoText)
+            } else {
+                durationSection
+                cardDivider
+                environmentSection
+                cardDivider
+                activitySection
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous)
+                .fill(.white)
+        )
+    }
+
     private func garmentPreview(for item: ClothingItem) -> some View {
-        VStack(spacing: 16) {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.gray.opacity(0.1))
-                .frame(width: 240, height: 240)
-                .overlay {
-                    GarmentIconView(item: item)
-                        .frame(width: 160, height: 160)
+        VStack(spacing: 12) {
+            ZStack(alignment: .bottomTrailing) {
+                GarmentIconView(item: item)
+                    .frame(width: 220, height: 220)
+
+                if let imageName = item.referenceImageName,
+                   let image = ImageStorage.loadImage(named: imageName) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 96, height: 96)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        )
+                        .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+                        .offset(x: 24)
                 }
+            }
 
             Text(item.nickname ?? "Nickname") // TODO: add auto nickname logic
-                .font(.headline)
+                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .foregroundStyle(.sienna)
         }
     }
-    
-    // fuckass returns returns
-    
-    private var silkInfoSection: some View {
-        Text("This garment is made of silk! In order to preserve the durability of this fabric, it is not recommended to wash it unless absolutely necessary (heavy sweat, staining, etc.)")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .frame(height: 264)
-    }
-    private var dryFitInfoSection: some View {
-        Text("This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use.")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .frame(height: 264)
+
+    private var cardDivider: some View {
+        Rectangle()
+            .fill(Color.deepBrown.opacity(0.12))
+            .frame(height: 1)
+            .padding(.vertical, 16)
     }
 
-    private var whiteInfoSection: some View {
-        Text("This garment is white in color. In order to preserve the brightness of the white fabric, it is recommended to wash it even after light use.")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+    private func infoSection(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 15, design: .rounded))
+            .foregroundStyle(.sienna)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .frame(height: 264)
+            .padding(.vertical, 8)
+    }
+
+    private var silkInfoText: String {
+        "This garment is made of silk! In order to preserve the durability of this fabric, it is not recommended to wash it unless absolutely necessary (heavy sweat, staining, etc.)"
+    }
+
+    private var dryFitInfoText: String {
+        "This garment is made of a dry-fit material. As it does not absorb sweat, in order to avoid bacterial growth and odor, it is recommended to wash it even after light use."
+    }
+
+    private var whiteInfoText: String {
+        "This garment is white in color. In order to preserve the brightness of the white fabric, it is recommended to wash it even after light use."
+    }
+
+    private func sectionHeader(_ title: String, description: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(.deepBrown)
+
+            Text(description)
+                .font(.system(size: 14, weight: .regular, design: .rounded))
+                .foregroundStyle(Color("textGrey"))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func stepperButton(
+        systemName: String,
+        fill: Color,
+        glyph: Color,
+        isDisabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(fill)
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: systemName)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(glyph)
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.4 : 1)
     }
 
     private var durationSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Duration worn:")
-                    .font(.headline)
+        HStack {
+            Text("Hours worn")
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(.deepBrown)
 
-                Spacer()
+            Spacer()
 
-                HStack(spacing: 8) {
-                    Button {
-                        inputWasChanged = true
-                        hoursWorn = max(1, hoursWorn - 1)
-                        hoursWornText = String(hoursWorn)
-                        durationFieldFocused = false
-                    } label: {
-                        Image(systemName: "minus")
-                    }
-                    .disabled(hoursWorn <= (currentItem?.savedEvaluation?.hoursWorn ?? 1)) // cant reduce in later evals lah
+            HStack(spacing: 12) {
+                stepperButton(
+                    systemName: "minus",
+                    fill: .tan,
+                    glyph: .sienna,
+                    isDisabled: hoursWorn <= (currentItem?.savedEvaluation?.hoursWorn ?? 1) // cant reduce in later evals lah
+                ) {
+                    inputWasChanged = true
+                    hoursWorn = max(1, hoursWorn - 1)
+                    hoursWornText = String(hoursWorn)
+                    durationFieldFocused = false
+                }
 
-                    TextField("", text: $hoursWornText)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 60)
-                        .focused($durationFieldFocused)
-                        .onChange(of: hoursWornText) { _, newValue in
-                            let numbersOnly = newValue.filter(\.isNumber)
+                TextField("", text: $hoursWornText)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.deepBrown)
+                    .frame(width: 44)
+                    .focused($durationFieldFocused)
+                    .onChange(of: hoursWornText) { _, newValue in
+                        let numbersOnly = newValue.filter(\.isNumber)
 
-                            if numbersOnly != newValue {
-                                hoursWornText = numbersOnly
-                                return
-                            }
-
-                            if let value = Int(numbersOnly) {
-                                let minimum = evaluationIsLocked
-                                    ? (currentItem?.savedEvaluation?.hoursWorn ?? 1)
-                                    : 1
-
-                                hoursWorn = min(99, max(minimum, value))
-
-                                if durationFieldFocused {
-                                    inputWasChanged = true
-                                }
-                            }
+                        if numbersOnly != newValue {
+                            hoursWornText = numbersOnly
+                            return
                         }
 
-                    Button {
-                        inputWasChanged = true
-                        hoursWorn = min(99, hoursWorn + 1)
-                        hoursWornText = String(hoursWorn)
-                        durationFieldFocused = false
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .disabled(hoursWorn >= 99)
-                }
-                
-                Text("     hours")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                        if let value = Int(numbersOnly) {
+                            let minimum = evaluationIsLocked
+                                ? (currentItem?.savedEvaluation?.hoursWorn ?? 1)
+                                : 1
 
-                Spacer()
+                            hoursWorn = min(99, max(minimum, value))
+
+                            if durationFieldFocused {
+                                inputWasChanged = true
+                            }
+                        }
+                    }
+
+                stepperButton(
+                    systemName: "plus",
+                    fill: .sienna,
+                    glyph: .tan,
+                    isDisabled: hoursWorn >= 99
+                ) {
+                    inputWasChanged = true
+                    hoursWorn = min(99, hoursWorn + 1)
+                    hoursWornText = String(hoursWorn)
+                    durationFieldFocused = false
+                }
             }
         }
     }
 
     private var environmentSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Environment:")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 12) {
+            sectionHeader("Environment", description: environmentDescription)
 
-                Text(environmentName)
-                    .foregroundStyle(.secondary)
-
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle) // env info
-                
-            }
-
-            HStack(spacing: 16) {
-                Image(systemName: "snowflake")
+            HStack(spacing: 12) {
+                Image(systemName: "thermometer.low")
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.secondary)
 
                 Slider(
@@ -465,29 +539,24 @@ struct EvaluationView: View {
                     in: 0...4,
                     step: 1
                 )
+                .tint(.tan)
 
-                Image(systemName: "sun.max")
+                Image(systemName: "thermometer.high")
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
-            Text(environmentDescription)
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 
     private var activitySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Activity level:")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 12) {
+            sectionHeader("Activity", description: activityDescription)
 
-                Text(activityName)
-                    .foregroundStyle(.secondary)
-            }
-
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 Image(systemName: "figure.seated.side")
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.secondary)
+
                 Slider(
                     value: Binding(
                         get: { Double(activityIndex) },
@@ -512,46 +581,45 @@ struct EvaluationView: View {
                     in: 0...4,
                     step: 1
                 )
+                .tint(.tan)
+
                 Image(systemName: "figure.run")
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
-            Text(activityDescription)
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 
     private var verdictSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Button {
                 registerDecision(washing: verdictIsWash)
             } label: {
-                Text(verdictText)
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(verdictIsWash ? .blue : .white)
-            .foregroundStyle(verdictIsWash ? .white : .blue)
-            .overlay {
-                if !verdictIsWash {
-                    RoundedRectangle(cornerRadius: 50)
-                        .stroke(.blue, lineWidth: 1)
+                ZStack {
+                    Image(verdictButtonAsset)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.secondary)
+
+                    Text(verdictText)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.offWhite)
                 }
             }
+            .buttonStyle(.plain)
 
             Button {
                 registerDecision(washing: !verdictIsWash)
             } label: {
                 Text(secondaryActionText)
-                    .font(.subheadline)
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .foregroundStyle(.sienna)
             }
             .buttonStyle(.plain)
         }
-        .padding(.top, 8)
+        .padding(.top, 4)
     }
-
+    // unused
     private var environmentName: String {
         switch currentEnvironment {
         case .cold:
@@ -567,6 +635,7 @@ struct EvaluationView: View {
         }
     }
 
+    // unused
     private var activityName: String {
         switch currentActivity {
         case .resting:
@@ -612,30 +681,12 @@ struct EvaluationView: View {
         }
     }
     
-    // making sure the clothes-saved counter doesn't increment unless modified before keeping
-    
-    private func registerSavedGarment(_ id: UUID) {
-        guard inputWasChanged else { return }
-
-        var savedIDs = Set(
-            clothesSavedFromOverWashingIDs
-                .split(separator: ",")
-                .compactMap { UUID(uuidString: String($0)) }
-        )
-
-        guard savedIDs.insert(id).inserted else { return }
-
-        clothesSavedFromOverWashingIDs = savedIDs
-            .map(\.uuidString)
-            .joined(separator: ",")
-
-        clothesSavedFromOverWashing = savedIDs.count
-    }
-
     private func registerDecision(washing: Bool) {
         guard currentIndex < clothesStore.pile.count else { return }
 
         let currentItem = clothesStore.pile[currentIndex]
+        let recommendedKeep = !verdictIsWash
+        let hadPreviousEvaluation = currentItem.savedEvaluation != nil
 
         if washing {
             clothesStore.sendToLaundry([currentItem.id])
@@ -646,7 +697,10 @@ struct EvaluationView: View {
                 activityIndex: activityIndex
             )
             clothesStore.savePersistence()
-            registerSavedGarment(currentItem.id)
+
+            if recommendedKeep && (!hadPreviousEvaluation || inputWasChanged) {
+                clothesSavedFromOverWashing += 1
+            }
         }
 
         advanceToNextItem()
@@ -673,7 +727,8 @@ struct EvaluationView: View {
     NavigationStack {
         EvaluationView(
             clothesStore: store,
-            toast: .constant(nil)
+            toast: .constant(nil),
+            path: .constant(NavigationPath())
         )
     }
 }

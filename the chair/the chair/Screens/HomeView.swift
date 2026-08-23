@@ -11,6 +11,7 @@ struct HomeView: View {
     @ObservedObject var clothesStore: ClothesStore
     @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
     @State private var toast: Toast?
+    @State private var path = NavigationPath()
     
     private var chairAssetName: String {
         switch clothesStore.pile.count {
@@ -34,7 +35,7 @@ struct HomeView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 16) {
                 Spacer()
 
@@ -43,14 +44,7 @@ struct HomeView: View {
                     .opacity(0.8)
                 Spacer()
 
-                NavigationLink {
-                    PileListView(
-                        clothesStore: clothesStore,
-                        currentIndex: .constant(0),
-                        selectionVersion: .constant(0),
-                        toast: $toast
-                    )
-                } label: {
+                NavigationLink(value: ClothesRoute.pileList) {
                     Image(chairAssetName)
                         .resizable()
                         .scaledToFit()
@@ -62,12 +56,7 @@ struct HomeView: View {
                 Spacer()
 
                 VStack(spacing: 16) {
-                    NavigationLink {
-                        EvaluationView(
-                            clothesStore: clothesStore,
-                            toast: $toast
-                        )
-                    } label: {
+                    NavigationLink(value: ClothesRoute.evaluate(index: nil)) {
                         ZStack{
                             Image("siennaButton")
                                 .resizable()
@@ -102,6 +91,7 @@ struct HomeView: View {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")
                         .font(Font.custom("SueEllenFrancisco", size: 48))
+                        .fontDesign(nil)
                         .foregroundStyle(.deepBrown)
                         .padding(.top, 160)
                     }
@@ -184,6 +174,23 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 8)
+            }
+            .navigationDestination(for: ClothesRoute.self) { route in
+                switch route {
+                case .pileList:
+                    PileListView(
+                        clothesStore: clothesStore,
+                        toast: $toast,
+                        path: $path
+                    )
+                case .evaluate(let index):
+                    EvaluationView(
+                        clothesStore: clothesStore,
+                        initialIndex: index,
+                        toast: $toast,
+                        path: $path
+                    )
+                }
             }
         }
         .toast($toast)
