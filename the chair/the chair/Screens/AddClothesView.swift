@@ -100,10 +100,12 @@ struct AddClothesView: View {
                 ToolbarItem(placement: .title){
                     Text("ADD NEW")
                         .font(Font.custom("SueEllenFrancisco", size: 32))
+                        .fontDesign(nil)
                         .padding(.top,8)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .backButton(.custom)
         }
     

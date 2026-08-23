@@ -59,6 +59,7 @@ struct AddFromClosetView: View {
                 ToolbarItem(placement: .principal) {
                     Text("CLOSET")
                         .font(Font.custom("SueEllenFrancisco", size: 32))
+                        .fontDesign(nil)
                         .padding(.top,8)
                 }
 
