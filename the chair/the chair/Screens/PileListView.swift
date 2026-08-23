@@ -68,6 +68,7 @@ struct PileListView: View {
                     .padding(.top,8)
             }
         }
+        .navigationBarBackButtonHidden(true)
         .backButton(.custom)
     }
 }
