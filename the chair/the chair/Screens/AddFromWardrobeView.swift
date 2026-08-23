@@ -25,6 +25,14 @@ struct AddFromClosetView: View {
         self.clothesStore = clothesStore
     }
     
+    private var searchOffset: CGFloat {
+        if isSearchFocused {
+            return 250
+        } else {
+            return -50
+        }
+    }
+    
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -55,10 +63,10 @@ struct AddFromClosetView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, proxy.safeAreaInsets.bottom - 50)
+                .padding(.bottom, proxy.safeAreaInsets.bottom + searchOffset)
             }
-            .ignoresSafeArea(.keyboard)
         }
+        .ignoresSafeArea(.keyboard)
         .background(
             Image("wardrobeBackground").ignoresSafeArea()
         )
@@ -131,7 +139,7 @@ struct AddFromClosetView: View {
                     .foregroundStyle(.sienna.opacity(0.8))
             } else {
                 ScrollView(.horizontal){
-                    VStack (alignment: .leading, spacing:50){
+                    VStack (alignment: .leading, spacing:40){
                         HStack(alignment: .top) {
                             ForEach(smallCloset) {
                                 garment in
@@ -230,6 +238,10 @@ struct AddFromClosetView: View {
                     HangerView(item: garment)
                         .frame(width: 180)
                         .scaleEffect(isSelected ? 1.1 : 1)
+                        .animation(
+                            .spring(response: 0.35, dampingFraction: 0.5, blendDuration: 0),
+                            value: isSelected
+                    )
                         .padding(.top, 35)
 
                     if let imageName = garment.referenceImageName,
@@ -241,28 +253,29 @@ struct AddFromClosetView: View {
                             .cornerRadius(12)
                             .offset(x: 60, y:offsetValue)
                     }
-                    HStack {
+                    HStack{
                         Text(garment.nickname ?? "Clothes Name")
                             .foregroundStyle(Color("White"))
                             .bold()
-                        if (isSelected) {
-                            ZStack {
-                                Image("secondaryButton")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 30)
-                                Image(systemName: "checkmark")
-                            }
+                            .padding(.leading, 30)
+                        ZStack {
+                            Image("secondaryButton")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30)
+                            Image(systemName: "checkmark")
+                                
                         }
+                        .opacity(isSelected ? 1 : 0)
                     }
-                    .padding(.top, 8)
-            }.onTapGesture {
+                    .offset(y:-10)
+            }
+                .onTapGesture {
                 if (isSelected) {
                     selectedGarments.remove(garment.id)
                 } else {
                     selectedGarments.insert(garment.id)
                 }
-                
             }
         }
     }
