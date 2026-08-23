@@ -99,35 +99,76 @@ struct AddFromClosetView: View {
             clothesStore.search(searchTerm, within: clothesStore.closet)
         }
         
-        private var closetDisplay: some View {
-            ScrollView(.horizontal){
-                LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
-                    ForEach(searchedCloset) {
-                        garment in
-                        closetDisplayItems(
-                            garment: garment,
-                            selectedGarments: $selectedGarments,
-                            isSelecting: $isSelecting
-                        )
+    private var closetDisplay: some View {
+        Group {
+            if searchedCloset.isEmpty {
+                Text("No matches found...")
+                    .font(.subheadline)
+                    .foregroundStyle(.sienna.opacity(0.8))
+            } else {
+                ScrollView(.horizontal) {
+                    LazyHGrid(rows: columns, alignment: .top, spacing: 22) {
+                        ForEach(searchedCloset) { garment in
+                            closetDisplayItems(
+                                garment: garment,
+                                selectedGarments: $selectedGarments,
+                                isSelecting: $isSelecting
+                            )
+                        }
                     }
-                }.padding(.horizontal, 20)
-            }
-        }
-        
-        private var closetList : some View {
-            List(searchedCloset, selection: $selectedGarments){
-                garment in
-                HStack{
-                    GarmentIconView(item: garment)
-                        .frame(width: 56, height: 56)
-                        .background(.gray.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    Text(garment.nickname ?? "NAME DOES NOT EXIST")
+                    .padding(.horizontal, 20)
                 }
             }
-            .environment(\.editMode, .constant(isSelecting ? .active : .inactive))
         }
+    }
         
+    private var closetList: some View {
+        Group {
+            if searchedCloset.isEmpty {
+                Text("No matches found...")
+                    .font(.subheadline)
+                    .foregroundStyle(.sienna.opacity(0.8))
+            } else {
+                List(searchedCloset, selection: $selectedGarments) {
+                    garment in
+                    HStack(spacing: 16) {
+                        GarmentIconView(item: garment)
+                            .frame(width: 56, height: 56)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        Text(garment.nickname ?? "NAME DOES NOT EXIST")
+                            .foregroundStyle(.deepBrown)
+
+                        Spacer()
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity)
+                    .background(.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .listRowInsets(
+                        EdgeInsets(
+                            top: 8,
+                            leading: 16,
+                            bottom: 8,
+                            trailing: 16
+                        )
+                    )
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                }
+                .environment(\.editMode, .constant(isSelecting ? .active : .inactive))
+                .background(
+                    ZStack {
+                        Color("backgroundBase")
+                        Image("Texture")
+                    }
+                    .ignoresSafeArea()
+                )
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            }
+        }
+    }
         struct closetDisplayItems: View {
             let garment: ClothingItem
             @Binding var selectedGarments: Set<UUID>

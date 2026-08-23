@@ -108,44 +108,52 @@ struct AddClothesView: View {
         }
     
     private var clothesPreviewNickname : some View {
-        VStack(spacing:16){
-            ZStack(alignment: .bottomTrailing){
-                GarmentPreviewView(clothingColor: $clothingColor, clothingSilhouette: $clothingSilhouette)
-                    .frame(width: 200, height: 200)
-                if let clothingImage {
-                    Image(uiImage: clothingImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                        .cornerRadius(12)
-                } else {
-                    // @ mask
-                    // TODO: add disabled if required fields not filled
-                    // TODO: add auto nickname logic if not already done
-                    Button(action: {
-                        showingCamera = true
-                    }) {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 24))
+        VStack(spacing:8){
+            VStack(spacing:16){
+                ZStack(alignment: .bottomTrailing){
+                    GarmentPreviewView(clothingColor: $clothingColor, clothingSilhouette: $clothingSilhouette)
+                        .frame(width: 200, height: 200)
+                    if let clothingImage {
+                        Image(uiImage: clothingImage)
+                            .resizable()
+                            .scaledToFit()
                             .frame(width: 80, height: 80)
-                    }.fullScreenCover(isPresented: $showingCamera){
-                        CameraView(image: $clothingImage)
-                            .ignoresSafeArea()
+                            .cornerRadius(12)
+                    } else {
+                        // @ mask
+                        // It's doneeee
+                        Button(action: {
+                            showingCamera = true
+                        }) {
+                            Image(systemName: "camera")
+                                .font(.system(size: 32))
+                                .frame(width: 80, height: 80)
+                                .foregroundStyle(Color(.systemGray3))
+                        }.fullScreenCover(isPresented: $showingCamera){
+                            CameraView(image: $clothingImage)
+                                .ignoresSafeArea()
+                        }
+                        .background(Color(.systemGray5))
+                        .cornerRadius(12)
                     }
-                    .background(Color(.systemGray5))
-                    .cornerRadius(12)
                 }
+                TextField("Nickname (optional)", text: $clothingNickname)
+                    .textFieldStyle(.plain)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(.infinity)
+                    .bold()
+                    .font(.title2)
             }
-            TextField("Nickname (optional)", text: $clothingNickname)
-                .textFieldStyle(.plain)
-                .multilineTextAlignment(.center)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(.infinity)
+            .padding(16)
+            .background(.white)
+            .cornerRadius(16)
+            Text("Give it a name. Optional, add a photo of something distinctive. A pattern, graphic, or tag works great.")
+                .font(.system(size:15))
+                .foregroundStyle(Color("Sienna"))
+                .opacity(0.8)
         }
-        .padding(16)
-        .background(.white)
-        .cornerRadius(16)
     }
     
     struct ColorPicker: View {
@@ -160,11 +168,11 @@ struct AddClothesView: View {
                         .fill(Color(color.rawValue))
                         .frame(width: 32)
                     Circle()
-                        .stroke(Color(.systemGray4), lineWidth: color == .white ? 2 : 0)
+                        .stroke(Color(.systemGray4), lineWidth: color == .white ? 1 : 0)
                         .frame(width: 32)
                     Circle()
-                        .stroke(Color(.systemGray2), lineWidth: color == selectedColor ? 4 : 0)
-                        .frame(width: 40)
+                        .stroke(color == .white ? Color(.systemGray4) : .white, lineWidth: color == selectedColor ? 3 : 0)
+                        .frame(width:22)
                 }
             }
         }
@@ -175,8 +183,9 @@ struct AddClothesView: View {
             HStack(){
                 Text("Color")
                     .font(.headline)
+                    .foregroundStyle(Color("Sienna"))
                 Text(clothingColor.rawValue)
-                    .foregroundStyle(Color(.systemGray))
+                    .foregroundStyle(Color("Tan"))
             }
             LazyVGrid(columns:[GridItem(.adaptive(minimum: 34))], alignment: .center){
                 ForEach(ClothingColor.allCases) {
@@ -195,27 +204,41 @@ struct AddClothesView: View {
             VStack{
                 Text("Material")
                     .font(.headline)
+                    .foregroundStyle(Color("Sienna"))
             }
             LazyVGrid(columns:columns, alignment: .leading){
                 ForEach(ClothingMaterial.allCases) {
                     material in
+                    
                     Button(action: {
                         self.clothingMaterial = material
                     }){
-                        Text(material.rawValue)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(
-                                clothingMaterial == material
-                                    ? Color.accentColor
-                                : Color(.systemGray5)
-                            )
-                            .foregroundStyle(
-                                clothingMaterial == material
-                                ? .white
-                                : Color(.systemGray)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                        VStack{
+                            ZStack{
+                                Rectangle()
+                                    .frame(height:100)
+                                    .foregroundStyle(Color("Cream"))
+                                    .cornerRadius(16)
+                                if (clothingMaterial == material) {
+                                    Image("squareButtonOutline")
+                                }
+                            }
+                            Text(material.rawValue)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(
+                                    clothingMaterial == material
+                                    ? Color("Tan")
+                                    : Color("Cream")
+                                )
+                                .foregroundStyle(
+                                    clothingMaterial == material
+                                    ? Color("White")
+                                    : Color("Sienna")
+                                )
+                                .font(.system(size:14, weight: .medium))
+                                .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                        }
                     }
                 }
             }
@@ -229,8 +252,9 @@ struct AddClothesView: View {
         VStack(alignment: .leading, spacing: 8){
             Text("Silhouette")
                 .font(.headline)
-            VStack(spacing:20){
-                LazyVGrid(columns:[GridItem(.adaptive(minimum: 150))], alignment: .leading){
+                .foregroundStyle(Color("Sienna"))
+            VStack(spacing:8){
+                HStack(){
                     ForEach(ClothingCategory.allCases) {
                         category in
                         Button(action: {
@@ -241,14 +265,15 @@ struct AddClothesView: View {
                                 .padding(.vertical, 8)
                                 .background(
                                     clothingCategory == category
-                                    ? Color.accentColor
-                                    : Color(.systemGray5)
+                                    ? Color("Tan")
+                                    : Color("Cream")
                                 )
                                 .foregroundStyle(
                                     clothingCategory == category
-                                    ? .white
-                                    : Color(.systemGray)
+                                    ? Color("White")
+                                    : Color("Sienna")
                                 )
+                                .font(.system(size:14, weight: .medium))
                                 .clipShape(RoundedRectangle(cornerRadius: .infinity))
                         }
                     }
@@ -263,7 +288,7 @@ struct AddClothesView: View {
     
     private var silhouetteSection: some View {
         VStack(alignment: .leading, spacing: 8){
-            LazyVGrid(columns:[GridItem(.adaptive(minimum: 100))], alignment: .center){
+            HStack(){
                 ForEach(silhouettesOptions){
                     silhouette in
                     Button(action: {
@@ -272,15 +297,20 @@ struct AddClothesView: View {
                     }){
                         ZStack{
                             Rectangle()
-                                .frame(width: .infinity, height:120)
-                                .foregroundStyle(clothingSilhouette == silhouette ? Color.accentColor : Color(.systemGray5))
+                                .frame(height:100)
+                                .foregroundStyle(Color("Cream"))
                                 .cornerRadius(16)
-                            Text(silhouette.name)
-                            .foregroundStyle(
-                                clothingSilhouette == silhouette
-                                ? .white
-                                : Color(.systemGray)
-                            )
+                            GarmentStaticView(clothingColor: .white, clothingSilhouette: silhouette)
+                                .frame(width: 80, height: 80)
+                            if (clothingSilhouette == silhouette) {
+                                Image("squareButtonOutline")
+                            }
+//                            Image("\(silhouette.rawValue)Silhouette")
+//                            .foregroundStyle(
+//                                clothingSilhouette == silhouette
+//                                ? .white
+//                                : Color(.systemGray)
+//                            )
                         }
 
                     }

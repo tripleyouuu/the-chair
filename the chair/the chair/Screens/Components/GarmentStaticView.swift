@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct GarmentPreviewView: View {
-    @Binding var clothingColor: ClothingColor
-    @Binding var clothingSilhouette: ClothingSilhouette
+struct GarmentStaticView: View {
+    var clothingColor: ClothingColor
+    var clothingSilhouette: ClothingSilhouette
     
     var body: some View {
         ZStack {
@@ -28,8 +28,8 @@ struct GarmentPreviewView: View {
 }
 
 #Preview {
-    @State var color : ClothingColor = .darkBlue
-    @State var  silhouette : ClothingSilhouette = .tShirt
-    GarmentPreviewView(clothingColor : $color, clothingSilhouette: $silhouette)
+    var color : ClothingColor = .darkBlue
+    var  silhouette : ClothingSilhouette = .tShirt
+    GarmentStaticView(clothingColor : color, clothingSilhouette: silhouette)
         .frame(width: 120, height: 120)
 }

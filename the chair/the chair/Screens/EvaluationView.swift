@@ -201,12 +201,13 @@ struct EvaluationView: View {
                     description: Text("Your laundry pile is empty.")
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(screenBackground)
             }
         }
+        .background(screenBackground)
         .navigationTitle("Evaluate")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("EVALUATE")
@@ -228,6 +229,7 @@ struct EvaluationView: View {
                 .buttonStyle(.plain)
             }
             .sharedBackgroundVisibility(.hidden)
+            
 
             // ^ a custom back button was needed to make the go-straight-home logic work
             
@@ -284,7 +286,6 @@ struct EvaluationView: View {
             .padding(.bottom, 24)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(screenBackground)
         .onTapGesture {
             durationFieldFocused = false
         }
