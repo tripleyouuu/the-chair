@@ -30,7 +30,7 @@ struct PileListView: View {
                         HStack {
                             GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
-                                .background(.gray.opacity(0.1))
+//                                .background(.gray.opacity(0.1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                             Text(item.nickname ?? "Nickname")
@@ -51,15 +51,15 @@ struct PileListView: View {
                 }
             }
             .padding()
-            .background(
-                ZStack {
-                    Color("backgroundBase")
-                    Image("Texture")
-                }
-                .ignoresSafeArea()
-            )
         }
-        .background(Color(.systemGroupedBackground))
+        .background(
+            ZStack {
+                Color("backgroundBase")
+                Image("Texture")
+            }
+            .ignoresSafeArea()
+        )
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("PILE")

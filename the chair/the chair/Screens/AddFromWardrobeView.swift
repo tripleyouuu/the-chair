@@ -120,7 +120,7 @@ struct AddFromClosetView: View {
                 HStack{
                     GarmentIconView(item: garment)
                         .frame(width: 56, height: 56)
-                        .background(.gray.opacity(0.1))
+//                        .background(.gray.opacity(0.1))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     Text(garment.nickname ?? "NAME DOES NOT EXIST")
                 }
