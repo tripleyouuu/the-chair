@@ -27,6 +27,7 @@ struct NotificationsSettingsView: View {
             ToolbarItem(placement: .principal) {
                 Text("SETTINGS")
                     .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .fontDesign(nil)
                     .padding(.top,8)
                     .foregroundStyle(.deepBrown)
             }

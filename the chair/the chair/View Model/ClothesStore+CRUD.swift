@@ -1,6 +1,6 @@
 //
 //  ClothesStore+CRUD.swift
-//  
+//
 //
 //  Created by Aurora Purnawan on 12/08/26.
 //
@@ -8,6 +8,7 @@
 import Foundation
 
 extension ClothesStore {
+
     // New items always start in the pile.
     func addItem(_ item: ClothingItem) {
         pile.append(item)
@@ -22,7 +23,8 @@ extension ClothesStore {
 
     func deleteItem(_ itemID: UUID) {
         pile.removeAll { $0.id == itemID }
-        closet.removeAll { $0.id == itemID }
+        smallCloset.removeAll { $0.id == itemID }
+        bigCloset.removeAll { $0.id == itemID }
         washList.removeAll { $0.id == itemID }
         savePersistence()
     }
@@ -30,13 +32,16 @@ extension ClothesStore {
     func logWear(for itemID: UUID, session: WearSession) {
         if let index = pile.firstIndex(where: { $0.id == itemID }) {
             pile[index].wearSessions.append(session)
-        } else if let index = closet.firstIndex(where: { $0.id == itemID }) {
-            closet[index].wearSessions.append(session)
+        } else if let index = smallCloset.firstIndex(where: { $0.id == itemID }) {
+            smallCloset[index].wearSessions.append(session)
+        } else if let index = bigCloset.firstIndex(where: { $0.id == itemID }) {
+            bigCloset[index].wearSessions.append(session)
         } else if let index = washList.firstIndex(where: { $0.id == itemID }) {
             washList[index].wearSessions.append(session)
         } else {
             return
         }
+
         savePersistence()
     }
 }
