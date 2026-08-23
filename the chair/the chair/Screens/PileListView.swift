@@ -8,10 +8,8 @@ import SwiftUI
 
 struct PileListView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @Binding var currentIndex: Int
-    @Binding var selectionVersion: Int
     @Binding var toast: Toast?
-//    @Environment(\.dismiss) private var dismiss
+    @Binding var path: NavigationPath
 
     var body: some View {
         ScrollView {
@@ -20,13 +18,7 @@ struct PileListView: View {
                     Array(clothesStore.pile.enumerated().reversed()),
                     id: \.element.id
                 ) { index, item in
-                    NavigationLink {
-                        EvaluationView(
-                            clothesStore: clothesStore,
-                            initialIndex: index,
-                            toast: $toast
-                        )
-                    } label: {
+                    NavigationLink(value: ClothesRoute.evaluate(index: index)) {
                         HStack {
                             GarmentIconView(item: item)
                                 .frame(width: 56, height: 56)
@@ -79,9 +71,8 @@ struct PileListView: View {
     NavigationStack {
         PileListView(
             clothesStore: store,
-            currentIndex: .constant(store.pile.count - 1),
-            selectionVersion: .constant(0),
-            toast: .constant(nil)
+            toast: .constant(nil),
+            path: .constant(NavigationPath())
         )
     }
 }

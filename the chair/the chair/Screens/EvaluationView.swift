@@ -7,10 +7,15 @@
 
 import SwiftUI
 
+enum ClothesRoute: Hashable {
+    case pileList
+    case evaluate(index: Int?)
+}
+
 struct EvaluationView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @Environment(\.dismiss) private var dismiss
     @Binding var toast: Toast?
+    @Binding var path: NavigationPath
     @State private var currentIndex: Int
     @State private var hoursWorn = 8
     @State private var hoursWornText = "8"
@@ -23,7 +28,6 @@ struct EvaluationView: View {
     @State private var selectionVersion = 0
     @State private var inputWasChanged = false
     @AppStorage("clothesSavedFromOverWashing") private var clothesSavedFromOverWashing = 0
-    @AppStorage("clothesSavedFromOverWashingIDs") private var clothesSavedFromOverWashingIDs = ""
 
 
     private let cardCornerRadius: CGFloat = 24
@@ -31,10 +35,12 @@ struct EvaluationView: View {
     init(
         clothesStore: ClothesStore,
         initialIndex: Int? = nil,
-        toast: Binding<Toast?>
+        toast: Binding<Toast?>,
+        path: Binding<NavigationPath>
     ) {
         self.clothesStore = clothesStore
         self._toast = toast
+        self._path = path
         let startingIndex = initialIndex ?? max(clothesStore.pile.count - 1, 0)
         _currentIndex = State(initialValue: startingIndex)
     }
@@ -93,7 +99,8 @@ struct EvaluationView: View {
             toast = Toast(message: "Sorted all items in pile!")
         }
 
-        dismiss()
+        // always go home
+        path = NavigationPath()
     }
     
     private func advanceToNextItem() {
@@ -163,7 +170,7 @@ struct EvaluationView: View {
 
         return currentItem.totalWearability
             - currentItem.usedWearability
-            - currentSession.usedWearability // we don't have past session persistence logic yet, but this should work once we do
+            - currentSession.usedWearability
     }
 
     private var verdictIsWash: Bool {
@@ -236,14 +243,7 @@ struct EvaluationView: View {
             
             
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    PileListView(
-                        clothesStore: clothesStore,
-                        currentIndex: $currentIndex,
-                        selectionVersion: $selectionVersion,
-                        toast: $toast
-                    )
-                } label: {
+                NavigationLink(value: ClothesRoute.pileList) {
                     ZStack{
                         Image("primaryButton")
                             .resizable()
@@ -273,19 +273,24 @@ struct EvaluationView: View {
     }
 
     private func evaluationContent(for item: ClothingItem) -> some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                garmentPreview(for: item)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 20) {
+                    garmentPreview(for: item)
 
-                evaluationCard(for: item)
-
-                verdictSection
+                    evaluationCard(for: item)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 8)
-            .padding(.bottom, 24)
+            .scrollDismissesKeyboard(.interactively)
+
+            // verdict buttons pinned to a fixed position
+            verdictSection
+                .padding(.horizontal, 24)
+                .padding(.bottom, 16)
         }
-        .scrollDismissesKeyboard(.interactively)
         .onTapGesture {
             durationFieldFocused = false
         }
@@ -665,30 +670,12 @@ struct EvaluationView: View {
         }
     }
     
-    // making sure the clothes-saved counter doesn't increment unless modified before keeping
-    
-    private func registerSavedGarment(_ id: UUID) {
-        guard inputWasChanged else { return }
-
-        var savedIDs = Set(
-            clothesSavedFromOverWashingIDs
-                .split(separator: ",")
-                .compactMap { UUID(uuidString: String($0)) }
-        )
-
-        guard savedIDs.insert(id).inserted else { return }
-
-        clothesSavedFromOverWashingIDs = savedIDs
-            .map(\.uuidString)
-            .joined(separator: ",")
-
-        clothesSavedFromOverWashing = savedIDs.count
-    }
-
     private func registerDecision(washing: Bool) {
         guard currentIndex < clothesStore.pile.count else { return }
 
         let currentItem = clothesStore.pile[currentIndex]
+        let recommendedKeep = !verdictIsWash
+        let hadPreviousEvaluation = currentItem.savedEvaluation != nil
 
         if washing {
             clothesStore.sendToLaundry([currentItem.id])
@@ -699,7 +686,10 @@ struct EvaluationView: View {
                 activityIndex: activityIndex
             )
             clothesStore.savePersistence()
-            registerSavedGarment(currentItem.id)
+
+            if recommendedKeep && (!hadPreviousEvaluation || inputWasChanged) {
+                clothesSavedFromOverWashing += 1
+            }
         }
 
         advanceToNextItem()
@@ -726,7 +716,8 @@ struct EvaluationView: View {
     NavigationStack {
         EvaluationView(
             clothesStore: store,
-            toast: .constant(nil)
+            toast: .constant(nil),
+            path: .constant(NavigationPath())
         )
     }
 }
