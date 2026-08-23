@@ -79,13 +79,17 @@ extension ClothesStore {
         }
         if smallCloset.isEmpty {
             smallCloset.append(moved)
-            lastPopulatedClosetSection = .small
+            if smallCloset.count >= bigCloset.count {
+                lastPopulatedClosetSection = .small
+            }
         } else if bigCloset.isEmpty {
             bigCloset.append(moved)
             lastPopulatedClosetSection = .big
         } else if lastPopulatedClosetSection == .big {
             smallCloset.append(moved)
-            lastPopulatedClosetSection = .small
+            if smallCloset.count >= bigCloset.count {
+                lastPopulatedClosetSection = .small
+            }
         } else {
             bigCloset.append(moved)
             lastPopulatedClosetSection = .big
