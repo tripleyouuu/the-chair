@@ -102,6 +102,7 @@ struct HomeView: View {
                 ToolbarItem(placement: .principal) {
                     Text("THE CHAIR")
                         .font(Font.custom("SueEllenFrancisco", size: 48))
+                        .fontDesign(nil)
                         .foregroundStyle(.deepBrown)
                         .padding(.top, 160)
                     }

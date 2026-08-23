@@ -64,6 +64,7 @@ struct PileListView: View {
             ToolbarItem(placement: .principal) {
                 Text("PILE")
                     .font(Font.custom("SueEllenFrancisco", size: 32))
+                    .fontDesign(nil)
                     .padding(.top,8)
             }
         }

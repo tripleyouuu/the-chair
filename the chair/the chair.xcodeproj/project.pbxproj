@@ -18,8 +18,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9AB2CD8E302AA92F0095EE49 /* the chair */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "the chair";
-			sourceTree = "<group>";
+			name = "the chair";
+			path = "/Users/vitha/Documents/challenges/the-chair/the chair/the chair";
+			sourceTree = "<absolute>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -260,7 +261,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7DCB2D9QMG;
+				DEVELOPMENT_TEAM = 2U76R4C6YB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "the-chair-Info.plist";
@@ -294,7 +295,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7DCB2D9QMG;
+				DEVELOPMENT_TEAM = 2U76R4C6YB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "the-chair-Info.plist";
