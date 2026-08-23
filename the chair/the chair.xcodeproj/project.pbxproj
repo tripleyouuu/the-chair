@@ -19,8 +19,8 @@
 		9AB2CD8E302AA92F0095EE49 /* the chair */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			name = "the chair";
-			path = "/Users/vitha/Documents/challenges/the-chair/the chair/the chair";
-			sourceTree = "<absolute>";
+			path = "the chair";
+			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 

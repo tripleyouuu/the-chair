@@ -274,17 +274,28 @@ struct EvaluationView: View {
 
     private func evaluationContent(for item: ClothingItem) -> some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 20) {
-                    garmentPreview(for: item)
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(spacing: 20) {
+                        garmentPreview(for: item)
 
-                    evaluationCard(for: item)
+                        // The card sizes to its content. These spacers centre it in
+                        // the room left below the garment, and collapse to nothing
+                        // once the card is tall enough to fill the viewport — so the
+                        // full input form still scrolls normally.
+                        Spacer(minLength: 0)
+
+                        evaluationCard(for: item)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
+                    .frame(minHeight: proxy.size.height)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
+                .scrollDismissesKeyboard(.interactively)
             }
-            .scrollDismissesKeyboard(.interactively)
 
             // verdict buttons pinned to a fixed position
             verdictSection
