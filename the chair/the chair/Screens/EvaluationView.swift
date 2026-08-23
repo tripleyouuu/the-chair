@@ -379,6 +379,11 @@ struct EvaluationView: View {
             .foregroundStyle(.sienna)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
+            // Holds roughly the height the input stack would occupy, so the card
+            // keeps its shape and the copy sits centred in it rather than
+            // collapsing to three lines. minHeight, not a fixed height, so long
+            // copy grows instead of clipping at larger text sizes.
+            .frame(minHeight: 264)
             .padding(.vertical, 8)
     }
 
