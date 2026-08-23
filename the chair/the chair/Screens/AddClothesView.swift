@@ -61,7 +61,7 @@ struct AddClothesView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        let newClothingNickname : String = clothingNickname == "" ? clothingColor.rawValue + " " + clothingSilhouette.rawValue : clothingNickname
+                        let newClothingNickname : String = clothingNickname == "" ? clothingColor.rawValue + " " + clothingSilhouette.name : clothingNickname
                         let newClothingImage : String? = clothingImage.flatMap{
                             ImageStorage.saveImage($0)
                         }
