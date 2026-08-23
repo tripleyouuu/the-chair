@@ -8,6 +8,12 @@
 import Combine
 import Foundation
 
+extension Array where Element == ClothingItem {
+    func filtered(by silhouettes: [ClothingSilhouette]) -> [ClothingItem] {
+        return self.filter { silhouettes.contains($0.silhouette) }
+    }
+}
+
 final class ClothesStore: ObservableObject {
     // The move-between-arrays risk is contained in
     // ClothesStore+PileFlow.swift's single moveItem helper, and a debug-only consistency check.
@@ -46,8 +52,9 @@ final class ClothesStore: ObservableObject {
         ]
 
         closet = [
+            // Tops
             ClothingItem(
-                nickname: "Everyday Tee",
+                nickname: "Basic White Tee",
                 clothingMaterial: .natural,
                 clothingColor: .white,
                 silhouette: .tShirt,
@@ -55,18 +62,96 @@ final class ClothesStore: ObservableObject {
                 referenceImageName: "testCircle"
             ),
             ClothingItem(
-                nickname: "Test",
+                nickname: "Office Button Up",
+                clothingMaterial: .natural,
+                clothingColor: .white,
+                silhouette: .buttonUpShirt,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Gym Tank",
                 clothingMaterial: .synthetic,
                 clothingColor: .black,
+                silhouette: .tankTop,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+
+            // Bottoms
+            ClothingItem(
+                nickname: "Work Slacks",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .pants,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Lounge Shorts",
+                clothingMaterial: .natural,
+                clothingColor: .black,
+                silhouette: .shorts,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Pleated Skirt",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .skirt,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+
+            // Full Body
+            ClothingItem(
+                nickname: "Maxi Dress",
+                clothingMaterial: .natural,
+                clothingColor: .white,
                 silhouette: .dress,
                 location: .wardrobe,
                 referenceImageName: "testCircle"
             ),
             ClothingItem(
-                nickname: "Dress Test",
+                nickname: "Party Mini",
                 clothingMaterial: .synthetic,
                 clothingColor: .black,
-                silhouette: .dress,
+                silhouette: .miniDress,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Utility Jumpsuit",
+                clothingMaterial: .natural,
+                clothingColor: .black,
+                silhouette: .jumpsuit,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+
+            // Outerwear
+            ClothingItem(
+                nickname: "Rain Jacket",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .jacket,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Knit Cardigan",
+                clothingMaterial: .natural,
+                clothingColor: .white,
+                silhouette: .cardigan,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Workout Hoodie",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .hoodie,
                 location: .wardrobe,
                 referenceImageName: "testCircle"
             )

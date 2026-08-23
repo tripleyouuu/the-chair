@@ -41,38 +41,46 @@ struct AddFromClosetView: View {
         )
         .backButton(isListView ? .hidden : .custom)
         .safeAreaInset(edge: .bottom) {
-            HStack {
+            HStack(){
                 searchBar
                 Button {
-                    clothesStore.addToPile(Array(selectedGarments))
-                    selectedGarments.removeAll()
-                    isSelecting = false
-                    dismiss()
+                    isListView.toggle()
                 } label: {
-                    Text("Add").padding(10)
+                    ZStack{
+                        Image("secondaryButton")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth:44)
+                        Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
+                            .foregroundStyle(.sienna)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 20)        }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("CLOSET")
+                    Text("SELECT CLOTHES")
                         .font(Font.custom("SueEllenFrancisco", size: 32))
                         .padding(.top,8)
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        isListView.toggle()
+                        clothesStore.addToPile(Array(selectedGarments))
+                        selectedGarments.removeAll()
+                        isSelecting = false
+                        dismiss()
                     } label: {
                         ZStack{
-                            Image("secondaryButton")
+                            Image("primaryButton")
                                 .resizable()
                                 .scaledToFit()
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth:44)
-                            Image(systemName: isListView ? "square.grid.2x2" : "list.dash")
-                                .foregroundStyle(.sienna)
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.offWhite)
                         }
                     }
                     .buttonStyle(.plain)
@@ -81,22 +89,34 @@ struct AddFromClosetView: View {
             }
         }
         
-        private var searchBar: some View {
+    private var searchBar: some View {
+        ZStack {
+            Image("customTextField")
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color("Sienna"))
                 TextField("Search", text: $searchTerm)
+                    .tint(.tan)
                     .focused($isSearchFocused)
             }
             .padding()
-            .background(Color(.systemGray5))
             .cornerRadius(.infinity)
             .padding(.vertical,8)
+            .padding(.horizontal,8)
         }
-        
-        private var searchedCloset: [ClothingItem] {
-            clothesStore.search(searchTerm, within: clothesStore.closet)
-        }
+    }
+    
+    private var searchedCloset: [ClothingItem] {
+        clothesStore.search(searchTerm, within: clothesStore.closet)
+    }
+    
+    private var smallCloset: [ClothingItem] {
+        searchedCloset.filtered(by: [.tShirt, .buttonUpShirt, .cardigan, .hoodie, .jacket, .shorts, .skirt, .tankTop])
+    }
+    
+    private var bigCloset: [ClothingItem] {
+        searchedCloset.filtered(by: [.dress, .jumpsuit, .pants, .miniDress])
+    }
         
     private var closetDisplay: some View {
         Group {
@@ -105,28 +125,35 @@ struct AddFromClosetView: View {
                     .font(.subheadline)
                     .foregroundStyle(.sienna.opacity(0.8))
             } else {
-                ScrollView(.horizontal){
-                    HStack() {
-                        ForEach(searchedCloset) {
-                            garment in
-                            closetDisplayItems(
-                                garment: garment,
-                                selectedGarments: $selectedGarments,
-                                isSelecting: $isSelecting
-                            )
+                VStack {
+                    ScrollView(.horizontal){
+                        VStack (alignment: .leading,spacing:45){
+                            HStack() {
+                                ForEach(smallCloset) {
+                                    garment in
+                                    closetDisplayItems(
+                                        garment: garment,
+                                        selectedGarments: $selectedGarments,
+                                        isSelecting: $isSelecting
+                                    )
+                                }
+                            }.padding(.horizontal, 20)
+                            HStack() {
+                                ForEach(bigCloset) {
+                                    garment in
+                                    closetDisplayItems(
+                                        garment: garment,
+                                        selectedGarments: $selectedGarments,
+                                        isSelecting: $isSelecting
+                                    )
+                                }
+                            }.padding(.horizontal, 20)
                         }
-                    }.padding(.horizontal, 20)
-                    HStack() {
-                        ForEach(searchedCloset) {
-                            garment in
-                            closetDisplayItems(
-                                garment: garment,
-                                selectedGarments: $selectedGarments,
-                                isSelecting: $isSelecting
-                            )
-                        }
-                        .padding(.horizontal, 20)
                     }
+                    .ignoresSafeArea()
+                    .padding(.top,1)
+//                    .background(.red)
+                    Spacer()
                 }
             }
         }
@@ -179,43 +206,56 @@ struct AddFromClosetView: View {
             }
         }
     }
-        struct closetDisplayItems: View {
-            let garment: ClothingItem
-            @Binding var selectedGarments: Set<UUID>
-            @Binding var isSelecting: Bool
-            private var isSelected: Bool {
-                selectedGarments.contains(garment.id)
-            }
-            var body : some View {
-                VStack{
-                    ZStack(alignment: .top){
-                        Image("hanger")
-                        GarmentIconView(item: garment)
-                            .frame(width: 170)
-                            .scaleEffect(isSelected ? 1.2 : 1)
-                        if let imageName = garment.referenceImageName, let image = ImageStorage.loadImage(named: imageName) {
-                            Image(uiImage: image)
+    
+    struct closetDisplayItems: View {
+        let garment: ClothingItem
+        @Binding var selectedGarments: Set<UUID>
+        @Binding var isSelecting: Bool
+        private var isSelected: Bool {
+            selectedGarments.contains(garment.id)
+        }
+        var body : some View {
+            VStack{
+                ZStack(alignment: .top) {
+                    Image("hanger")
+                    GarmentIconView(item: garment)
+                        .frame(width: 180)
+                        .scaleEffect(isSelected ? 1.2 : 1)
+                        .padding(.top, 35)
+
+                    if let imageName = garment.referenceImageName,
+                       let image = ImageStorage.loadImage(named: imageName) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                            .cornerRadius(12)
+                    }
+                }
+                HStack {
+                    Text(garment.nickname ?? "Clothes Name")
+                        .foregroundStyle(Color("White"))
+                        .bold()
+                    if (isSelected) {
+                        ZStack {
+                            Image("secondaryButton")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .cornerRadius(12)
+                                .frame(width: 30)
+                            Image(systemName: "checkmark")
                         }
                     }
-                    Text(garment.nickname ?? "NAME DOES NOT EXIST")
-                        .padding(8)
-                        .padding(.horizontal, 12)
-                        .background(isSelected ? Color("Yellow") : .clear)
-                        .cornerRadius(99)
-                }.onTapGesture {
-                    if (isSelected) {
-                        selectedGarments.remove(garment.id)
-                    } else {
-                        selectedGarments.insert(garment.id)
-                    }
-                    
                 }
+            }.onTapGesture {
+                if (isSelected) {
+                    selectedGarments.remove(garment.id)
+                } else {
+                    selectedGarments.insert(garment.id)
+                }
+                
             }
         }
+    }
 }
 
 #Preview {
