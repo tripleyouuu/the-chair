@@ -13,7 +13,7 @@ struct AddClothesView: View {
     @State private var clothingMaterial: ClothingMaterial = .dryFit
     @State private var clothingCategory: ClothingCategory = .top
     @State private var clothingSilhouette: ClothingSilhouette = .tShirt
-    @State private var clothingColor: ClothingColor = .black
+    @State private var clothingColor: ClothingColor = .white
     @State private var showingCamera : Bool = false // control the camera
     @State private var clothingImage : UIImage?
     

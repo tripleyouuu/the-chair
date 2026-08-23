@@ -18,7 +18,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9AB2CD8E302AA92F0095EE49 /* the chair */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			name = "the chair";
 			path = "the chair";
 			sourceTree = "<group>";
 		};
@@ -261,7 +260,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2U76R4C6YB;
+				DEVELOPMENT_TEAM = 7DCB2D9QMG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "the-chair-Info.plist";
@@ -295,7 +294,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2U76R4C6YB;
+				DEVELOPMENT_TEAM = 7DCB2D9QMG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "the-chair-Info.plist";

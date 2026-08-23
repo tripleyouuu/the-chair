@@ -116,11 +116,11 @@ struct AddFromClosetView: View {
     }
     
     private var smallCloset: [ClothingItem] {
-        searchedCloset.filtered(by: [.tShirt, .buttonUpShirt, .cardigan, .hoodie, .jacket, .shorts, .skirt, .tankTop])
+        clothesStore.search(searchTerm, within: clothesStore.smallCloset)
     }
     
     private var bigCloset: [ClothingItem] {
-        searchedCloset.filtered(by: [.dress, .jumpsuit, .pants, .miniDress])
+        clothesStore.search(searchTerm, within: clothesStore.bigCloset)
     }
         
     private var closetDisplay: some View {
@@ -131,7 +131,7 @@ struct AddFromClosetView: View {
                     .foregroundStyle(.sienna.opacity(0.8))
             } else {
                 ScrollView(.horizontal){
-                    VStack (alignment: .leading, spacing:16){
+                    VStack (alignment: .leading, spacing:50){
                         HStack(alignment: .top) {
                             ForEach(smallCloset) {
                                 garment in
