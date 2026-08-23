@@ -300,6 +300,8 @@ struct AddClothesView: View {
                                 .frame(height:100)
                                 .foregroundStyle(Color("Cream"))
                                 .cornerRadius(16)
+                            GarmentStaticView(clothingColor: .white, clothingSilhouette: silhouette)
+                                .frame(width: 80, height: 80)
                             if (clothingSilhouette == silhouette) {
                                 Image("squareButtonOutline")
                             }
