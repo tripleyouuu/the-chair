@@ -105,6 +105,7 @@ struct AddClothesView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .backButton(.custom)
         }
     
