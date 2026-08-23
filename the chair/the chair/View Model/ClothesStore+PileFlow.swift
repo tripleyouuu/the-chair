@@ -7,12 +7,18 @@
 
 
 import Foundation
-
 extension ClothesStore {
     // Closet -> Pile
     func addToPile(_ itemIDs: [UUID]) {
         var movedItems: [ClothingItem] = []
-        closet.removeAll { item in
+        smallCloset.removeAll { item in
+            guard itemIDs.contains(item.id) else { return false }
+            var moved = item
+            moved.location = .pile
+            movedItems.append(moved)
+            return true
+        }
+        bigCloset.removeAll { item in
             guard itemIDs.contains(item.id) else { return false }
             var moved = item
             moved.location = .pile
@@ -40,8 +46,7 @@ extension ClothesStore {
         savePersistence()
         validateNoDuplicatesOrLoss()
     }
-
-    // Laundry Bag -> Closet 
+    // Laundry Bag -> Closet
     func finishWashing(_ itemIDs: [UUID]) {
         var movedItems: [ClothingItem] = []
         washList.removeAll { item in
@@ -53,20 +58,48 @@ extension ClothesStore {
             movedItems.append(washed)
             return true
         }
-        closet.append(contentsOf: movedItems)
+        for item in movedItems {
+            addToClosetSection(item)
+        }
         savePersistence()
         validateNoDuplicatesOrLoss()
     }
-
+    private func addToClosetSection(_ item: ClothingItem) {
+        let bigSilhouettes: Set<ClothingSilhouette> = [
+            .dress,
+            .jumpsuit,
+            .pants,
+            .miniDress
+        ]
+        var moved = item
+        moved.location = .wardrobe
+        if bigSilhouettes.contains(moved.silhouette) {
+            bigCloset.append(moved)
+            return
+        }
+        if smallCloset.isEmpty {
+            smallCloset.append(moved)
+            lastPopulatedClosetSection = .small
+        } else if bigCloset.isEmpty {
+            bigCloset.append(moved)
+            lastPopulatedClosetSection = .big
+        } else if lastPopulatedClosetSection == .big {
+            smallCloset.append(moved)
+            lastPopulatedClosetSection = .small
+        } else {
+            bigCloset.append(moved)
+            lastPopulatedClosetSection = .big
+        }
+    }
     // Debug-only safety net — crashes loudly during development if an item ever ends up
     // in two arrays at once. Compiled out entirely in release builds, zero shipped cost.
     private func validateNoDuplicatesOrLoss() {
         #if DEBUG
-        let allIDs = pile.map(\.id) + closet.map(\.id) + washList.map(\.id)
+        let allIDs = pile.map(\.id) + smallCloset.map(\.id) + bigCloset.map(\.id) + washList.map(\.id)
         let uniqueIDs = Set(allIDs)
         assert(
             allIDs.count == uniqueIDs.count,
-            "An item exists in more than one of pile/closet/washList — check the last move operation."
+            "An item exists in more than one of pile/smallCloset/bigCloset/washList — check the last move operation."
         )
         #endif
     }

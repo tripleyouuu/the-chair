@@ -112,11 +112,11 @@ struct AddFromClosetView: View {
     }
     
     private var smallCloset: [ClothingItem] {
-        searchedCloset.filtered(by: [.tShirt, .buttonUpShirt, .cardigan, .hoodie, .jacket, .shorts, .skirt, .tankTop])
+        clothesStore.search(searchTerm, within: clothesStore.smallCloset)
     }
     
     private var bigCloset: [ClothingItem] {
-        searchedCloset.filtered(by: [.dress, .jumpsuit, .pants, .miniDress])
+        clothesStore.search(searchTerm, within: clothesStore.bigCloset)
     }
         
     private var closetDisplay: some View {
@@ -138,7 +138,10 @@ struct AddFromClosetView: View {
                                         isSelecting: $isSelecting
                                     )
                                 }
-                            }.padding(.horizontal, 20)
+                            }
+                            .padding(.horizontal, 20)
+                            .frame(height: 250, alignment: .top)
+
                             HStack() {
                                 ForEach(bigCloset) {
                                     garment in
@@ -148,12 +151,14 @@ struct AddFromClosetView: View {
                                         isSelecting: $isSelecting
                                     )
                                 }
-                            }.padding(.horizontal, 20)
+                            }
+                            .padding(.horizontal, 20)
+                            .frame(height: 250, alignment: .top)
                         }
                     }
                     .ignoresSafeArea()
                     .padding(.top,1)
-//                    .background(.red)
+    //                    .background(.red)
                     Spacer()
                 }
             }

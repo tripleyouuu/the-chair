@@ -7,32 +7,38 @@
 
 import Combine
 import Foundation
-
 extension Array where Element == ClothingItem {
     func filtered(by silhouettes: [ClothingSilhouette]) -> [ClothingItem] {
         return self.filter { silhouettes.contains($0.silhouette) }
     }
 }
-
 final class ClothesStore: ObservableObject {
+    enum ClosetSection: String {
+        case big
+        case small
+    }
     // The move-between-arrays risk is contained in
     // ClothesStore+PileFlow.swift's single moveItem helper, and a debug-only consistency check.
     @Published var pile: [ClothingItem] = []
-    @Published var closet: [ClothingItem] = []
+    @Published var smallCloset: [ClothingItem] = []
+    @Published var bigCloset: [ClothingItem] = []
     @Published var washList: [ClothingItem] = []
-
+    var lastPopulatedClosetSection: ClosetSection = .big
+    var closet: [ClothingItem] {
+        smallCloset + bigCloset
+    }
     let persistence = ClothesPersistence()
-
     init() {
         if let saved = persistence.load() {
             pile = saved.pile
-            closet = saved.closet
+            smallCloset = saved.smallCloset
+            bigCloset = saved.bigCloset
             washList = saved.washList
+            lastPopulatedClosetSection = ClosetSection(rawValue: saved.lastPopulatedClosetSection) ?? .big
         } else {
             seedMockData()
         }
     }
-
     private func seedMockData() {
         pile = [
             ClothingItem(
@@ -50,8 +56,7 @@ final class ClothesStore: ObservableObject {
                 location: .pile
             )
         ]
-
-        closet = [
+        smallCloset = [
             // Tops
             ClothingItem(
                 nickname: "Basic White Tee",
@@ -77,16 +82,6 @@ final class ClothesStore: ObservableObject {
                 location: .wardrobe,
                 referenceImageName: "testCircle"
             ),
-
-            // Bottoms
-            ClothingItem(
-                nickname: "Work Slacks",
-                clothingMaterial: .synthetic,
-                clothingColor: .black,
-                silhouette: .pants,
-                location: .wardrobe,
-                referenceImageName: "testCircle"
-            ),
             ClothingItem(
                 nickname: "Lounge Shorts",
                 clothingMaterial: .natural,
@@ -103,33 +98,6 @@ final class ClothesStore: ObservableObject {
                 location: .wardrobe,
                 referenceImageName: "testCircle"
             ),
-
-            // Full Body
-            ClothingItem(
-                nickname: "Maxi Dress",
-                clothingMaterial: .natural,
-                clothingColor: .white,
-                silhouette: .dress,
-                location: .wardrobe,
-                referenceImageName: "testCircle"
-            ),
-            ClothingItem(
-                nickname: "Party Mini",
-                clothingMaterial: .synthetic,
-                clothingColor: .black,
-                silhouette: .miniDress,
-                location: .wardrobe,
-                referenceImageName: "testCircle"
-            ),
-            ClothingItem(
-                nickname: "Utility Jumpsuit",
-                clothingMaterial: .natural,
-                clothingColor: .black,
-                silhouette: .jumpsuit,
-                location: .wardrobe,
-                referenceImageName: "testCircle"
-            ),
-
             // Outerwear
             ClothingItem(
                 nickname: "Rain Jacket",
@@ -156,7 +124,42 @@ final class ClothesStore: ObservableObject {
                 referenceImageName: "testCircle"
             )
         ]
-
+        bigCloset = [
+            // Bottoms
+            ClothingItem(
+                nickname: "Work Slacks",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .pants,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            // Full Body
+            ClothingItem(
+                nickname: "Maxi Dress",
+                clothingMaterial: .natural,
+                clothingColor: .white,
+                silhouette: .dress,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Party Mini",
+                clothingMaterial: .synthetic,
+                clothingColor: .black,
+                silhouette: .miniDress,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            ),
+            ClothingItem(
+                nickname: "Utility Jumpsuit",
+                clothingMaterial: .natural,
+                clothingColor: .black,
+                silhouette: .jumpsuit,
+                location: .wardrobe,
+                referenceImageName: "testCircle"
+            )
+        ]
         washList = [
             ClothingItem(
                 nickname: "Slip Dress",
@@ -168,12 +171,13 @@ final class ClothesStore: ObservableObject {
         ]
         savePersistence()
     }
-
     func savePersistence() {
         persistence.save(
             pile: pile,
-            closet: closet,
-            washList: washList
+            smallCloset: smallCloset,
+            bigCloset: bigCloset,
+            washList: washList,
+            lastPopulatedClosetSection: lastPopulatedClosetSection.rawValue
         )
     }
 }
