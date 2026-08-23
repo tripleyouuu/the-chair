@@ -38,30 +38,34 @@ struct BackButtonModifier: UIViewControllerRepresentable {
                 topItem.hidesBackButton = true
 
             case .custom:
-                if topItem.leftBarButtonItem?.tag != 9999 {
-                    let backImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysOriginal)
+                // Reapply every update pass rather than skipping once already
+                // set — heavy structural changes elsewhere on screen (e.g. a
+                // List being swapped for other content) can cause the system
+                // to silently reset the nav item's leftBarButtonItem. Keeping
+                // this unconditional makes it self-heal instead of leaving a
+                // stale native button behind.
+                let backImage = UIImage(named: "backButton")?.withRenderingMode(.alwaysOriginal)
 
-                    let buttonSize: CGFloat = 44
-                    let leadingInset: CGFloat = 0
+                let buttonSize: CGFloat = 44
+                let leadingInset: CGFloat = 0
 
-                    let button = UIButton(type: .custom)
-                    button.setImage(backImage, for: .normal)
-                    button.imageView?.contentMode = .scaleAspectFit
-                    button.addTarget(context.coordinator, action: #selector(Coordinator.goBack), for: .touchUpInside)
-                    button.frame = CGRect(x: leadingInset, y: 0, width: buttonSize, height: buttonSize)
+                let button = UIButton(type: .custom)
+                button.setImage(backImage, for: .normal)
+                button.imageView?.contentMode = .scaleAspectFit
+                button.addTarget(context.coordinator, action: #selector(Coordinator.goBack), for: .touchUpInside)
+                button.frame = CGRect(x: leadingInset, y: 0, width: buttonSize, height: buttonSize)
 
-                    let container = UIView(frame: CGRect(x: 0, y: 0, width: buttonSize + leadingInset, height: buttonSize))
-                    container.addSubview(button)
+                let container = UIView(frame: CGRect(x: 0, y: 0, width: buttonSize + leadingInset, height: buttonSize))
+                container.addSubview(button)
 
-                    let barItem = UIBarButtonItem(customView: container)
-                    barItem.tag = 9999
-                    if #available(iOS 26.0, *) {
-                        barItem.hidesSharedBackground = true
-                    }
-
-                    topItem.leftBarButtonItem = barItem
-                    topItem.hidesBackButton = true
+                let barItem = UIBarButtonItem(customView: container)
+                barItem.tag = 9999
+                if #available(iOS 26.0, *) {
+                    barItem.hidesSharedBackground = true
                 }
+
+                topItem.leftBarButtonItem = barItem
+                topItem.hidesBackButton = true
 
                 context.coordinator.navigationController = navigationController
                 navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
