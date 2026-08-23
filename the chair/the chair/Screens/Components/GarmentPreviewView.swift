@@ -1,5 +1,5 @@
 //
-//  GarmentIconView.swift
+//  GarmentPreviewView.swift
 //  the chair
 //
 //  Created by Vitha Watson on 19/08/26.
@@ -12,11 +12,17 @@ struct GarmentPreviewView: View {
     @Binding var clothingSilhouette: ClothingSilhouette
     
     var body: some View {
-        Image("\(clothingSilhouette.rawValue)Silhouette")
-            .renderingMode(.template)
-            .resizable()
-            .scaledToFit()
-            .foregroundStyle(Color(clothingColor.rawValue))
+        ZStack {
+            Image("\(clothingSilhouette.rawValue)Silhouette")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(Color(clothingColor.rawValue))
+
+            Image("\(clothingSilhouette.rawValue)Outline")
+                .resizable()
+                .scaledToFit()
+        }
     }
 }
 
