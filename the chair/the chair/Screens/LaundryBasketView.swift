@@ -93,7 +93,7 @@ struct LaundryBasketView: View {
                     showClearAlert = true
                 } label: {
                     ZStack{
-                        Image("primaryButton")
+                        Image(laundryItems.isEmpty ? "disabledButton" : "primaryButton")
                             .resizable()
                             .scaledToFit()
                             .foregroundStyle(.secondary)
@@ -103,6 +103,7 @@ struct LaundryBasketView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .disabled(laundryItems.isEmpty)
             }
             .sharedBackgroundVisibility(.hidden)
             // TODO: add disabled if list is empty + its asset implementation

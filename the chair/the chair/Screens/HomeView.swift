@@ -58,7 +58,7 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     NavigationLink(value: ClothesRoute.evaluate(index: nil)) {
                         ZStack{
-                            Image("siennaButton")
+                            Image(clothesStore.pile.isEmpty ? "grayButton" : "siennaButton")
                                 .resizable()
                                 .scaledToFit()
                                 .foregroundStyle(.secondary)
