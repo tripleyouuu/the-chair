@@ -8,22 +8,22 @@
 import SwiftUI
 
 enum ClothingColor: String, CaseIterable, Codable, Identifiable {
-    case white = "White"
-    case black = "Black"
-    case gray = "Grey"
-    case beige = "Beige"
     case red = "Red"
-    case lightGreen = "Light Green"
-    case darkGreen = "Dark Green"
-    case lightTeal = "Light Teal"
-    case darkTeal = "Dark Teal"
-    case lightBlue = "Light Blue"
-    case darkBlue = "Dark Blue"
-    case pink = "Pink"
     case orange = "Orange"
     case yellow = "Yellow"
+    case beige = "Beige"
+    case lightGreen = "Light Green"
+    case darkGreen = "Dark Green"
+    case darkTeal = "Dark Teal"
+    case lightTeal = "Light Teal"
+    case lightBlue = "Light Blue"
+    case darkBlue = "Dark Blue"
     case purple = "Purple"
+    case pink = "Pink"
+    case gray = "Grey"
     case brown = "Brown"
+    case white = "White"
+    case black = "Black"
 
     var id: String { rawValue }
 

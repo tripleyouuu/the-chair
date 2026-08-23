@@ -13,7 +13,7 @@ struct AddClothesView: View {
     @State private var clothingMaterial: ClothingMaterial = .dryFit
     @State private var clothingCategory: ClothingCategory = .top
     @State private var clothingSilhouette: ClothingSilhouette = .tShirt
-    @State private var clothingColor: ClothingColor = .white
+    @State private var clothingColor: ClothingColor = .red
     @State private var showingCamera : Bool = false // control the camera
     @State private var clothingImage : UIImage?
     
@@ -221,6 +221,7 @@ struct AddClothesView: View {
                                     .frame(height:100)
                                     .foregroundStyle(Color("Cream"))
                                     .cornerRadius(16)
+                                Image(material.rawValue)
                                 if (clothingMaterial == material) {
                                     Image("squareButtonOutline")
                                 }
