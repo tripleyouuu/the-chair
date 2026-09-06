@@ -9,12 +9,17 @@ import SwiftUI
 
 struct AddFromClosetView: View {
     @ObservedObject var clothesStore: ClothesStore
-    @State var searchTerm : String = ""
-    @State var isListView : Bool = false
-    @State private var selectedGarments: Set<UUID> = []
-    @State private var isSelecting = true
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isSearchFocused: Bool
+    
+    @State private var selectedGarments: Set<UUID> = []
+    @State private var isSelecting = true
+    
+    @State var searchTerm : String = ""
+    @State var isListView : Bool = false
+    @State var deletingItemUUID : UUID?
+    @State var showDeleteConfirmation : Bool = false
+    
     @State private var editingGarment: ClothingItem?
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
@@ -100,6 +105,20 @@ struct AddFromClosetView: View {
             }
             .sharedBackgroundVisibility(.hidden)
         }
+        .alert("Delete item", isPresented: $showDeleteConfirmation) {
+            Button("Confirm", role: .destructive) {
+                if (deletingItemUUID != nil) {
+                    // shut up ill make this better later
+                    clothesStore.deleteItem(deletingItemUUID!)
+                    deletingItemUUID = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                deletingItemUUID = nil
+            }
+        } message: {
+            Text("This action cannot be undone")
+        }
         .sheet(item: $editingGarment) { garment in
             NavigationStack {
                 EditClothesView(
@@ -154,6 +173,8 @@ struct AddFromClosetView: View {
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
                                     isSelecting: $isSelecting,
+                                    showDeleteConfirmation : $showDeleteConfirmation,
+                                    deletingItemUUID: $deletingItemUUID
                                     editingGarment: $editingGarment
                                 )
                             }
@@ -165,6 +186,8 @@ struct AddFromClosetView: View {
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
                                     isSelecting: $isSelecting,
+                                    showDeleteConfirmation : $showDeleteConfirmation,
+                                    deletingItemUUID: $deletingItemUUID
                                     editingGarment: $editingGarment
                                 )
                             }
@@ -233,6 +256,8 @@ struct AddFromClosetView: View {
         private var isSelected: Bool {
             selectedGarments.contains(garment.id)
         }
+        @Binding var showDeleteConfirmation : Bool
+        @Binding var deletingItemUUID : UUID?
         
         private var offsetValue: CGFloat {
             switch garment.silhouette {
@@ -295,6 +320,8 @@ struct AddFromClosetView: View {
                     Label("Edit", systemImage: "pencil")
                 }
                 Button(role:.destructive){
+                    deletingItemUUID = garment.id
+                    showDeleteConfirmation = true
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }

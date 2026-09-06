@@ -40,6 +40,7 @@ extension ClothesStore {
             rebalanceClosetSections()
         }
         washList.removeAll { $0.id == itemID }
+        print("YES ITS WORKING")
         savePersistence()
     }
     func logWear(for itemID: UUID, session: WearSession) {
