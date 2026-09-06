@@ -20,6 +20,7 @@ struct AddFromClosetView: View {
     @State var deletingItemUUID : UUID?
     @State var showDeleteConfirmation : Bool = false
     
+    @State private var editingGarment: ClothingItem?
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
     
@@ -118,8 +119,15 @@ struct AddFromClosetView: View {
         } message: {
             Text("This action cannot be undone")
         }
+        .sheet(item: $editingGarment) { garment in
+            NavigationStack {
+                EditClothesView(
+                    clothesStore: clothesStore,
+                    garment: garment
+                )
+            }
         }
-        
+    }
     private var searchBar: some View {
         ZStack {
             Image("customTextField")
@@ -167,6 +175,7 @@ struct AddFromClosetView: View {
                                     isSelecting: $isSelecting,
                                     showDeleteConfirmation : $showDeleteConfirmation,
                                     deletingItemUUID: $deletingItemUUID
+                                    editingGarment: $editingGarment
                                 )
                             }
                         }
@@ -179,6 +188,7 @@ struct AddFromClosetView: View {
                                     isSelecting: $isSelecting,
                                     showDeleteConfirmation : $showDeleteConfirmation,
                                     deletingItemUUID: $deletingItemUUID
+                                    editingGarment: $editingGarment
                                 )
                             }
                         }
@@ -242,6 +252,7 @@ struct AddFromClosetView: View {
         let garment: ClothingItem
         @Binding var selectedGarments: Set<UUID>
         @Binding var isSelecting: Bool
+        @Binding var editingGarment: ClothingItem?
         private var isSelected: Bool {
             selectedGarments.contains(garment.id)
         }
@@ -304,6 +315,7 @@ struct AddFromClosetView: View {
             // GO TO HERE FOR EDIT AND DELETE
             .contextMenu{
                 Button {
+                    editingGarment = garment
                 } label: {
                     Label("Edit", systemImage: "pencil")
                 }
