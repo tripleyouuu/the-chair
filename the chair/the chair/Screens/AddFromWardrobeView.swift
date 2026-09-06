@@ -15,7 +15,7 @@ struct AddFromClosetView: View {
     @State private var isSelecting = true
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isSearchFocused: Bool
-    
+    @State private var editingGarment: ClothingItem?
     let columns = [GridItem(.fixed(300)),
                    GridItem(.fixed(300))]
     
@@ -100,8 +100,15 @@ struct AddFromClosetView: View {
             }
             .sharedBackgroundVisibility(.hidden)
         }
+        .sheet(item: $editingGarment) { garment in
+            NavigationStack {
+                EditClothesView(
+                    clothesStore: clothesStore,
+                    garment: garment
+                )
+            }
         }
-        
+    }
     private var searchBar: some View {
         ZStack {
             Image("customTextField")
@@ -146,7 +153,8 @@ struct AddFromClosetView: View {
                                 closetDisplayItems(
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
-                                    isSelecting: $isSelecting
+                                    isSelecting: $isSelecting,
+                                    editingGarment: $editingGarment
                                 )
                             }
                         }
@@ -156,7 +164,8 @@ struct AddFromClosetView: View {
                                 closetDisplayItems(
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
-                                    isSelecting: $isSelecting
+                                    isSelecting: $isSelecting,
+                                    editingGarment: $editingGarment
                                 )
                             }
                         }
@@ -220,6 +229,7 @@ struct AddFromClosetView: View {
         let garment: ClothingItem
         @Binding var selectedGarments: Set<UUID>
         @Binding var isSelecting: Bool
+        @Binding var editingGarment: ClothingItem?
         private var isSelected: Bool {
             selectedGarments.contains(garment.id)
         }
@@ -280,6 +290,7 @@ struct AddFromClosetView: View {
             // GO TO HERE FOR EDIT AND DELETE
             .contextMenu{
                 Button {
+                    editingGarment = garment
                 } label: {
                     Label("Edit", systemImage: "pencil")
                 }
