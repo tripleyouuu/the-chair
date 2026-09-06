@@ -173,9 +173,9 @@ struct AddFromClosetView: View {
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
                                     isSelecting: $isSelecting,
+                                    editingGarment: $editingGarment,
                                     showDeleteConfirmation : $showDeleteConfirmation,
                                     deletingItemUUID: $deletingItemUUID
-                                    editingGarment: $editingGarment
                                 )
                             }
                         }
@@ -186,9 +186,9 @@ struct AddFromClosetView: View {
                                     garment: garment,
                                     selectedGarments: $selectedGarments,
                                     isSelecting: $isSelecting,
+                                    editingGarment: $editingGarment,
                                     showDeleteConfirmation : $showDeleteConfirmation,
                                     deletingItemUUID: $deletingItemUUID
-                                    editingGarment: $editingGarment
                                 )
                             }
                         }
