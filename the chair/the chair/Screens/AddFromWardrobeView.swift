@@ -270,11 +270,22 @@ struct AddFromClosetView: View {
                     }
                     .offset(y:-10)
             }
-                .onTapGesture {
+            .onTapGesture {
                 if (isSelected) {
                     selectedGarments.remove(garment.id)
                 } else {
                     selectedGarments.insert(garment.id)
+                }
+            }
+            // GO TO HERE FOR EDIT AND DELETE
+            .contextMenu{
+                Button {
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                Button(role:.destructive){
+                } label: {
+                    Label("Delete", systemImage: "trash")
                 }
             }
         }
